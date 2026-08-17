@@ -1,9 +1,12 @@
+import MainLayout from './layouts/MainLayout/MainLayout';
+
 function App() {
   return (
-    <div>
-      <h1>VacMais</h1>
-      <p>Frontend funcionando!</p>
-    </div>
+    <MainLayout>
+      <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-gray-400">
+        Conteúdo da página (visualização temporária do layout)
+      </div>
+    </MainLayout>
   );
 }
 
