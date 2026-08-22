@@ -1,11 +1,10 @@
 import MainLayout from './layouts/MainLayout/MainLayout';
-import Servicos from './pages/Servicos/Servicos';
-
+import Calendario from './pages/Calendario/Calendario';
 
 function App() {
   return (
     <MainLayout>
-      <Servicos />
+      <Calendario />
     </MainLayout>
   );
 }
