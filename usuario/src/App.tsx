@@ -1,10 +1,8 @@
-import  MissionCard from './pages/Missao/Missao';
+import InformacoesVacinais from './pages/informacoes/InformacoesVacinais';
 
 function App() {
   return (
-    < MissionCard>
-
-    </ MissionCard>
+    <InformacoesVacinais />
   );
 }
 
