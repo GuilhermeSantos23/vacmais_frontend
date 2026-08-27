@@ -1,28 +1,26 @@
 import { BellOutlined, MenuOutlined, SearchOutlined } from '@ant-design/icons';
 import { formatFullDate } from '../../../utils/formatDate';
+import { useUser } from '../../../hooks/useUser';
+import { useAlert } from '../../../hooks/useAlert';
+import UserAvatar from '../../common/UserAvatar/UserAvatar';
 
 interface HeaderProps {
   onMenuClick: () => void;
-  userName?: string;
   userRole?: string;
   region?: string;
 }
 
-// Os valores padrão abaixo são apenas placeholders visuais.
-// Quando o login/autenticação existir, esses dados virão do usuário logado.
+// O nome e o avatar do usuário vêm do UserContext (compartilhado com a
+// página Settings). Os valores padrão abaixo são apenas placeholders visuais
+// para os dados que ainda não têm origem em um backend/autenticação.
 function Header({
   onMenuClick,
-  userName = 'Usuário',
   userRole = 'Vac+ Cidadãos',
   region = 'Região não definida',
 }: HeaderProps) {
+  const { userName } = useUser();
+  const { hasUnreadNotification } = useAlert();
   const today = formatFullDate(new Date());
-  const initials = userName
-    .split(' ')
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
 
   return (
     <header className="flex items-center gap-3 border-b border-gray-200 bg-white px-4 py-3 lg:px-8">
@@ -43,15 +41,16 @@ function Header({
       <button
         type="button"
         aria-label="Notificações"
-        className="text-lg text-gray-500 hover:text-gray-700"
+        className="relative text-lg text-gray-500 hover:text-gray-700"
       >
         <BellOutlined />
+        {hasUnreadNotification && (
+          <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-500" />
+        )}
       </button>
 
       <div className="hidden items-center gap-2 sm:flex">
-        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-200 text-sm font-bold text-emerald-950">
-          {initials}
-        </span>
+        <UserAvatar size={36} />
         <div className="text-left text-sm">
           <p className="font-semibold text-gray-900">{userName}</p>
           <p className="text-gray-500">{userRole}</p>

@@ -82,8 +82,8 @@ function CapaContent() {
         CADERNETA DE VACINAÇÃO
       </h2>
       <p className="mt-4 max-w-md text-sm text-gray-700 sm:text-base">
-        Documento digital oficial — registre, consulte e comprove sua imunização ao longo da
-        vida.
+        Documento digital oficial — registre, consulte e comprove sua imunização
+        ao longo da vida.
       </p>
       <p className="mt-8 text-sm font-semibold text-gray-900">
         Vac+ · Plataforma Nacional de Imunização
@@ -145,7 +145,9 @@ function VaccineCard({ vaccine }: VaccineCardProps) {
 
       <div className="sm:pt-6">
         <p className="text-sm text-gray-500">Local: {vaccine.location}</p>
-        <p className="text-sm text-gray-500">Profissional: {vaccine.professional}</p>
+        <p className="text-sm text-gray-500">
+          Profissional: {vaccine.professional}
+        </p>
       </div>
     </div>
   );
@@ -181,7 +183,10 @@ function VacinasContent() {
           >
             Imprimir
           </button>
-          <button type="button" className="text-sm text-gray-600 hover:text-gray-800">
+          <button
+            type="button"
+            className="text-sm text-gray-600 hover:text-gray-800"
+          >
             Compartilhar QRcode
           </button>
         </div>
