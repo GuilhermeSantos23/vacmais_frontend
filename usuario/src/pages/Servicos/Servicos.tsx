@@ -55,9 +55,7 @@ function Servicos() {
             <h2 className="text-sm font-bold tracking-wide text-gray-800">
               {service.title}
             </h2>
-            <p className="mt-2 text-sm text-gray-500">
-              {service.description}
-            </p>
+            <p className="mt-2 text-sm text-gray-500">{service.description}</p>
           </div>
         ))}
       </div>

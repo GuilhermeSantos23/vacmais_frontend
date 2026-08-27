@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Drawer } from 'antd';
 import {
   CloseOutlined,
@@ -13,13 +14,16 @@ interface HamburgerMenuProps {
 }
 
 const menuItems = [
-  { label: 'Missão', icon: <CompassOutlined /> },
-  { label: 'Serviços', icon: <ToolOutlined /> },
-  { label: 'Configurações', icon: <SettingOutlined /> },
-  { label: 'Sair', icon: <LogoutOutlined /> },
+  { label: 'Missão', icon: <CompassOutlined />, to: '/missao' },
+  { label: 'Serviços', icon: <ToolOutlined />, to: '/servicos' },
+  { label: 'Configurações', icon: <SettingOutlined />, to: '/configuracoes' },
+  { label: 'Sair', icon: <LogoutOutlined />, to: '/login' },
 ];
 
 const DARK_GREEN = '#022c22';
+
+const itemClassName =
+  'flex items-center gap-3 rounded-lg px-3 py-2 text-sm !text-emerald-100 hover:bg-emerald-900 hover:!text-white';
 
 function HamburgerMenu({ open, onClose }: HamburgerMenuProps) {
   return (
@@ -43,19 +47,17 @@ function HamburgerMenu({ open, onClose }: HamburgerMenuProps) {
       <ul className="flex flex-col gap-1">
         {menuItems.map((item) => (
           <li key={item.label}>
-            <a
-              href="#"
-              onClick={onClose}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm !text-emerald-100 hover:bg-emerald-900 hover:!text-white"
-            >
-              <span className="text-base !text-emerald-100">
-                {item.icon}
-              </span>
-
-              <span className="!text-emerald-100">
-                {item.label}
-              </span>
-            </a>
+            {item.to ? (
+              <Link to={item.to} onClick={onClose} className={itemClassName}>
+                <span className="text-base !text-emerald-100">{item.icon}</span>
+                <span className="!text-emerald-100">{item.label}</span>
+              </Link>
+            ) : (
+              <a href="#" onClick={onClose} className={itemClassName}>
+                <span className="text-base !text-emerald-100">{item.icon}</span>
+                <span className="!text-emerald-100">{item.label}</span>
+              </a>
+            )}
           </li>
         ))}
       </ul>

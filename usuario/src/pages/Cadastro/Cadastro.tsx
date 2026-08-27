@@ -1,7 +1,8 @@
-import { useState, type FormEvent } from 'react';
-import { CheckCircleOutlined } from '@ant-design/icons';
+import { useEffect, useState, type FormEvent } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '../../layouts/AuthLayout/AuthLayout';
 import FormField from '../../components/form/FormField/FormField';
+import ValidationOverlay from '../../components/common/ValidationOverlay/ValidationOverlay';
 import { maskCPF, maskTelefone } from '../../utils/masks';
 
 interface CadastroErrors {
@@ -11,6 +12,8 @@ interface CadastroErrors {
   email?: string;
   senha?: string;
 }
+
+type ValidationStep = 'idle' | 'validating' | 'success';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -22,7 +25,9 @@ function Cadastro() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [errors, setErrors] = useState<CadastroErrors>({});
-  const [enviado, setEnviado] = useState(false);
+  const [validationStep, setValidationStep] = useState<ValidationStep>('idle');
+
+  const navigate = useNavigate();
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -40,98 +45,126 @@ function Cadastro() {
     // Cartão SUS é opcional, por isso não entra na validação.
 
     setErrors(novosErros);
-    setEnviado(Object.keys(novosErros).length === 0);
+
+    if (Object.keys(novosErros).length === 0) {
+      setValidationStep('validating');
+    }
   }
+
+  // Como ainda não existe backend de cadastro, este efeito só agenda as
+  // próximas transições visuais (validando → sucesso → Login), totalizando
+  // ~3 segundos. Nenhuma API é chamada aqui.
+  useEffect(() => {
+    if (validationStep === 'validating') {
+      const timer = setTimeout(() => setValidationStep('success'), 1500);
+      return () => clearTimeout(timer);
+    }
+
+    if (validationStep === 'success') {
+      const timer = setTimeout(() => {
+        navigate('/login', { state: { cadastroSucesso: true } });
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [validationStep, navigate]);
 
   return (
     <AuthLayout>
-      <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-        Criar conta de cidadão
-      </h2>
-      <p className="mt-1 text-sm text-gray-500">
-        Acesse sua caderneta vacinal digital em segundos
-      </p>
-
-      <form
-        onSubmit={handleSubmit}
-        className="mt-6 flex flex-col gap-4"
-        noValidate
-      >
-        <FormField
-          label="Nome completo"
-          type="text"
-          value={nome}
-          onChange={(event) => setNome(event.target.value)}
-          error={errors.nome}
-        />
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <FormField
-            label="CPF"
-            type="text"
-            inputMode="numeric"
-            placeholder="000.000.000-00"
-            value={cpf}
-            onChange={(event) => setCpf(maskCPF(event.target.value))}
-            error={errors.cpf}
-          />
-
-          <FormField
-            label="Cartão SUS"
-            type="text"
-            inputMode="numeric"
-            placeholder="opcional"
-            value={cartaoSus}
-            onChange={(event) => setCartaoSus(event.target.value)}
-          />
-
-          <FormField
-            label="Telefone"
-            type="tel"
-            placeholder="(00) 00000-0000"
-            value={telefone}
-            onChange={(event) => setTelefone(maskTelefone(event.target.value))}
-            error={errors.telefone}
-          />
-        </div>
-
-        <FormField
-          label="E-mail"
-          type="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          error={errors.email}
-        />
-
-        <FormField
-          label="Senha"
-          type="password"
-          value={senha}
-          onChange={(event) => setSenha(event.target.value)}
-          error={errors.senha}
-        />
-
-        <p className="text-sm text-gray-600">
-          Já tem conta?{' '}
-          <a href="#" className="font-medium text-emerald-700 hover:underline">
-            Entre
-          </a>
+      <div className="relative">
+        <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+          Criar conta de cidadão
+        </h2>
+        <p className="mt-1 text-sm text-gray-500">
+          Acesse sua caderneta vacinal digital em segundos
         </p>
 
-        {enviado && (
-          <p className="flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-            <CheckCircleOutlined />
-            Dados válidos! O cadastro será integrado futuramente.
-          </p>
-        )}
-
-        <button
-          type="submit"
-          className="mt-2 w-full rounded-lg bg-emerald-300 py-3 text-sm font-semibold text-emerald-950 transition-colors hover:bg-emerald-400"
+        <form
+          onSubmit={handleSubmit}
+          className="mt-6 flex flex-col gap-4"
+          noValidate
         >
-          Criar conta
-        </button>
-      </form>
+          <FormField
+            label="Nome completo"
+            type="text"
+            value={nome}
+            onChange={(event) => setNome(event.target.value)}
+            error={errors.nome}
+          />
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <FormField
+              label="CPF"
+              type="text"
+              inputMode="numeric"
+              placeholder="000.000.000-00"
+              value={cpf}
+              onChange={(event) => setCpf(maskCPF(event.target.value))}
+              error={errors.cpf}
+            />
+
+            <FormField
+              label="Cartão SUS"
+              type="text"
+              inputMode="numeric"
+              placeholder="opcional"
+              value={cartaoSus}
+              onChange={(event) => setCartaoSus(event.target.value)}
+            />
+
+            <FormField
+              label="Telefone"
+              type="tel"
+              placeholder="(00) 00000-0000"
+              value={telefone}
+              onChange={(event) =>
+                setTelefone(maskTelefone(event.target.value))
+              }
+              error={errors.telefone}
+            />
+          </div>
+
+          <FormField
+            label="E-mail"
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            error={errors.email}
+          />
+
+          <FormField
+            label="Senha"
+            type="password"
+            value={senha}
+            onChange={(event) => setSenha(event.target.value)}
+            error={errors.senha}
+          />
+
+          <p className="text-sm text-gray-600">
+            Já tem conta?{' '}
+            <Link
+              to="/login"
+              className="font-medium text-emerald-700 hover:underline"
+            >
+              Entre
+            </Link>
+          </p>
+
+          <button
+            type="submit"
+            className="mt-2 w-full rounded-lg bg-emerald-300 py-3 text-sm font-semibold text-emerald-950 transition-colors hover:bg-emerald-400"
+          >
+            Criar conta
+          </button>
+        </form>
+
+        {validationStep !== 'idle' && (
+          <ValidationOverlay
+            status={validationStep === 'validating' ? 'validating' : 'success'}
+            validatingText="Validando cadastro..."
+            successText="Cadastro efetuado com sucesso"
+          />
+        )}
+      </div>
     </AuthLayout>
   );
 }
