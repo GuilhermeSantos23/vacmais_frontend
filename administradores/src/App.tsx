@@ -1,10 +1,8 @@
-import MainLayout from './layouts/MainLayout/MainLayout';
+import Login from './pages/Login/Login';
 
 function App() {
   return (
-    <MainLayout>
-      <div></div>
-    </MainLayout>
+      <Login />
   );
 }
 
