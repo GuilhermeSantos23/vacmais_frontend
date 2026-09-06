@@ -1,10 +1,10 @@
 import MainLayout from './layouts/MainLayout/MainLayout';
-import Profissionais from './pages/Profissionais/Profissionais';
+import Dashboard from './pages/Dashboard/Dashboard';
 
 function App() {
   return (
     <MainLayout>
-      <Profissionais />
+      <Dashboard />
     </MainLayout>
   );
 }
