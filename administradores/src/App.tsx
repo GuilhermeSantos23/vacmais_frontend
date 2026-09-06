@@ -1,8 +1,11 @@
-import Login from './pages/Login/Login';
+import MainLayout from './layouts/MainLayout/MainLayout';
+import Movimentacoes from './pages/Movimentacoes/Movimentacoes';
 
 function App() {
   return (
-      <Login />
+    <MainLayout>
+      <Movimentacoes />
+    </MainLayout>
   );
 }
 
