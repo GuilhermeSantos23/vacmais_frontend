@@ -1,8 +1,11 @@
-import Login from './pages/Login/Login';
+import MainLayout from './layouts/MainLayout/MainLayout';
+import Profissionais from './pages/Profissionais/Profissionais';
 
 function App() {
   return (
-      <Login />
+    <MainLayout>
+      <Profissionais />
+    </MainLayout>
   );
 }
 
