@@ -28,22 +28,12 @@ const EXAMPLE_DEVICES: ConnectedDevice[] = [
     lastActive: 'há 2h',
     type: 'mobile',
   },
-  {
-    id: '3',
-    name: 'iPad Air',
-    browser: 'Edge',
-    location: 'Campinas, SP',
-    lastActive: 'há 1 dia',
-    type: 'mobile',
-  },
 ];
 
-function DevicesTab() {
+function DeviceTab() {
   return (
     <div className="rounded-lg border border-gray-100 bg-white p-5 shadow-sm">
-      <h2 className="text-sm font-bold tracking-wide text-gray-800">
-        Dispositivos Conectados
-      </h2>
+      <h2 className="text-sm font-bold tracking-wide text-gray-800">Dispositivos Conectados</h2>
 
       <ul className="mt-4 flex flex-col gap-3">
         {EXAMPLE_DEVICES.map((device) => (
@@ -52,11 +42,7 @@ function DevicesTab() {
             className="flex items-center gap-3 rounded-lg border border-gray-100 p-4"
           >
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
-              {device.type === 'desktop' ? (
-                <DesktopOutlined />
-              ) : (
-                <MobileOutlined />
-              )}
+              {device.type === 'desktop' ? <DesktopOutlined /> : <MobileOutlined />}
             </span>
             <div>
               <p className="text-sm font-medium text-gray-900">
@@ -73,4 +59,4 @@ function DevicesTab() {
   );
 }
 
-export default DevicesTab;
+export default DeviceTab;

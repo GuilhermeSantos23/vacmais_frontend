@@ -4,13 +4,10 @@ interface ValidationOverlayProps {
   successText: string;
 }
 
-// Tela de validação usada tanto no Login quanto no Cadastro, enquanto o
-// backend real de autenticação/cadastro ainda não é integrado.
-function ValidationOverlay({
-  status,
-  validatingText,
-  successText,
-}: ValidationOverlayProps) {
+// Tela de validação usada no Login e no "Esqueci minha senha", enquanto o
+// backend real ainda não existe. O check é desenhado com uma animação
+// simples de stroke-dasharray/stroke-dashoffset.
+function ValidationOverlay({ status, validatingText, successText }: ValidationOverlayProps) {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-white">
       {status === 'validating' ? (

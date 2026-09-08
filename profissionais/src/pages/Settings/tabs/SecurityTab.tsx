@@ -1,9 +1,6 @@
 import { useState } from 'react';
 import { Switch, Input, Alert } from 'antd';
 
-// A ativação real da autenticação em duas etapas (envio do código por
-// email) depende do backend. Por enquanto guardamos só a preferência
-// localmente, deixando o ponto de integração pronto para o futuro.
 function SecurityTab() {
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(true);
 
@@ -24,27 +21,19 @@ function SecurityTab() {
 
   return (
     <div className="rounded-lg border border-gray-100 bg-white p-5 shadow-sm">
-      <h2 className="text-sm font-bold tracking-wide text-gray-800">
-        Segurança da Conta
-      </h2>
+      <h2 className="text-sm font-bold tracking-wide text-gray-800">Segurança da Conta</h2>
 
       <div className="mt-4 mb-6 flex items-center justify-between rounded-lg border border-gray-100 p-4">
         <div>
-          <p className="text-sm font-medium text-gray-900">
-            Autenticação em duas etapas
-          </p>
-          <p className="text-sm text-gray-500">
-            Receba um código de verificação a cada login.
-          </p>
+          <p className="text-sm font-medium text-gray-900">Autenticação em duas etapas</p>
+          <p className="text-sm text-gray-500">Receba um código de verificação a cada login.</p>
         </div>
         <Switch checked={twoFactorEnabled} onChange={setTwoFactorEnabled} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <label className="block">
-          <span className="mb-1 block text-sm font-medium text-gray-700">
-            Senha Atual
-          </span>
+          <span className="mb-1 block text-sm font-medium text-gray-700">Senha Atual</span>
           <Input.Password
             value={currentPassword}
             onChange={(event) => setCurrentPassword(event.target.value)}
@@ -54,9 +43,7 @@ function SecurityTab() {
         <div />
 
         <label className="block">
-          <span className="mb-1 block text-sm font-medium text-gray-700">
-            Nova Senha
-          </span>
+          <span className="mb-1 block text-sm font-medium text-gray-700">Nova Senha</span>
           <Input.Password
             value={newPassword}
             onChange={(event) => setNewPassword(event.target.value)}
@@ -74,9 +61,7 @@ function SecurityTab() {
         </label>
       </div>
 
-      {passwordError && (
-        <Alert type="error" message={passwordError} showIcon className="mt-4" />
-      )}
+      {passwordError && <Alert type="error" message={passwordError} showIcon className="mt-4" />}
 
       <div className="mt-6 flex justify-end">
         <button

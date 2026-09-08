@@ -65,11 +65,7 @@ function Login() {
           Autentique-se com suas credenciais profissionais.
         </p>
 
-        <form
-          onSubmit={handleSubmit}
-          className="mt-6 flex flex-col gap-4"
-          noValidate
-        >
+        <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4" noValidate>
           <FormField
             label="CPF"
             type="text"
@@ -93,7 +89,7 @@ function Login() {
             type="text"
             inputMode="numeric"
             maxLength={8}
-            placeholder="UBS-23814673"
+            placeholder="12345678"
             value={codigoUnidade}
             onChange={(event) =>
               setCodigoUnidade(maskNumeric(event.target.value, 8))

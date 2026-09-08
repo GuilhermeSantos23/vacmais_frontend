@@ -11,13 +11,10 @@ interface FieldProps {
   type?: string;
 }
 
-// Campo de formulário simples, reaproveitado pelos 6 campos do Perfil.
 function Field({ label, value, onChange, type = 'text' }: FieldProps) {
   return (
     <label className="block">
-      <span className="mb-1 block text-sm font-medium text-gray-700">
-        {label}
-      </span>
+      <span className="mb-1 block text-sm font-medium text-gray-700">{label}</span>
       <input
         type={type}
         value={value}
@@ -28,23 +25,26 @@ function Field({ label, value, onChange, type = 'text' }: FieldProps) {
   );
 }
 
-// Os valores abaixo são apenas o estado inicial do formulário (vazios).
-// Futuramente virão do backend, assim que a API de perfil for integrada.
+// Os dados abaixo são fictícios e servem apenas para a demonstração do frontend.
+// Futuramente serão carregados do perfil do profissional autenticado pelo backend.
 function ProfileTab() {
   const { userName, setUserName } = useUser();
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
-  const [fullName, setFullName] = useState(userName);
+  const [firstName, setFirstName] = useState('Helena');
+  const [lastName, setLastName] = useState('Ramos');
   const [cpf, setCpf] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [crm, setCrm] = useState('');
-
+  const [crm, setCrm] = useState('54321');
 
   function handleSave() {
-    setUserName(fullName);
+    const fullName = `${firstName} ${lastName}`.trim();
+    setUserName(fullName || userName);
     // TODO: futuramente enviar esses dados para o backend via Axios.
   }
+
+  const fullName = `${firstName} ${lastName}`.trim();
 
   return (
     <div className="rounded-lg border border-gray-100 bg-white p-5 shadow-sm">
@@ -66,12 +66,12 @@ function ProfileTab() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label="Nome Completo" value={fullName} onChange={setFullName} />
+        <Field label="Nome" value={firstName} onChange={setFirstName} />
+        <Field label="Sobrenome" value={lastName} onChange={setLastName} />
         <Field label="CPF" value={cpf} onChange={setCpf} />
         <Field label="Email" value={email} onChange={setEmail} type="email" />
         <Field label="Telefone" value={phone} onChange={setPhone} />
         <Field label="CRM" value={crm} onChange={setCrm} />
-
       </div>
 
       <div className="mt-6 flex justify-end">
@@ -84,10 +84,7 @@ function ProfileTab() {
         </button>
       </div>
 
-      <AvatarPickerModal
-        open={isPickerOpen}
-        onClose={() => setIsPickerOpen(false)}
-      />
+      <AvatarPickerModal open={isPickerOpen} onClose={() => setIsPickerOpen(false)} />
     </div>
   );
 }

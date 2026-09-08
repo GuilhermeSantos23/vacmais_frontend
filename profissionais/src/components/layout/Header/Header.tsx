@@ -14,14 +14,13 @@ interface HeaderProps {
 // autenticação real existir.
 function Header({
   userRole = 'Vac+ Profissionais',
-  unity = 'Unidade não definida',
+  unity = 'UBS Pimentas',
 }: HeaderProps) {
   const { userName } = useUser();
   const today = formatFullDate(new Date());
 
   return (
-    <header className="flex items-center gap-3 border-b border-gray-200 bg-white px-4 py-3 lg:px-8">
-      {/* Campo de busca */}
+    <header className="flex items-center gap-4 border-b border-gray-200 bg-white px-4 py-4 lg:px-10">
       <div className="relative min-w-0 flex-1">
         <SearchOutlined className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
 
@@ -32,18 +31,16 @@ function Header({
         />
       </div>
 
-      {/* Data e unidade */}
-      <div className="hidden text-right text-sm text-gray-600 md:block">
+      <div className="hidden shrink-0 text-right text-sm text-gray-600 md:block">
         <p className="font-semibold text-gray-900">{today}</p>
         <p>Unidade: {unity}</p>
       </div>
 
-      {/* Usuário */}
-      <div className="hidden items-center gap-2 sm:flex">
+      <div className="hidden shrink-0 items-center gap-2 sm:flex">
         <UserAvatar size={36} />
 
         <div className="text-left text-sm">
-          <p className="font-semibold text-gray-900">{userName}</p>
+          <p className="font-semibold text-gray-900">Dr(a) {userName}</p>
           <p className="text-gray-500">{userRole}</p>
         </div>
       </div>

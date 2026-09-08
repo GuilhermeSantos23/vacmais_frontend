@@ -9,9 +9,9 @@ import { maskNumeric } from '../../utils/masks';
 type ValidationStep = 'idle' | 'validating' | 'success';
 
 // Como ainda não existe backend, este fluxo não verifica o código de
-// verdade: qualquer código preenchido é aceito ("tudo dá certo"), como
-// pedido. Futuramente o backend será responsável por gerar, enviar,
-// validar e expirar esse código.
+// verdade: qualquer código preenchido é aceito ("tudo dá certo"). O
+// backend futuramente será responsável por gerar, enviar, validar e
+// expirar esse código.
 function EsqueciSenha() {
   const [codigo, setCodigo] = useState('');
   const [erro, setErro] = useState('');
@@ -58,11 +58,7 @@ function EsqueciSenha() {
           abaixo para continuar.
         </p>
 
-        <form
-          onSubmit={handleSubmit}
-          className="mt-6 flex flex-col gap-4"
-          noValidate
-        >
+        <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4" noValidate>
           <FormField
             label="Código de verificação"
             type="text"

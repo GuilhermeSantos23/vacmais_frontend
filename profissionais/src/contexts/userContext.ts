@@ -7,6 +7,4 @@ export interface UserContextValue {
   setAvatarId: (id: string | null) => void;
 }
 
-export const UserContext = createContext<UserContextValue | undefined>(
-  undefined,
-);
+export const UserContext = createContext<UserContextValue | undefined>(undefined);

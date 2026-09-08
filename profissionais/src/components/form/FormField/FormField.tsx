@@ -5,21 +5,14 @@ interface FormFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }
 
-function FormField({
-  label,
-  error,
-  id,
-  className,
-  ...inputProps
-}: FormFieldProps) {
+// Campo de formulário simples e reutilizado em todo o sistema: label +
+// input + mensagem de erro opcional embaixo.
+function FormField({ label, error, id, className, ...inputProps }: FormFieldProps) {
   const fieldId = id ?? `campo-${label.toLowerCase().replace(/\s+/g, '-')}`;
 
   return (
     <div className={className}>
-      <label
-        htmlFor={fieldId}
-        className="mb-1 block text-sm font-medium text-gray-900"
-      >
+      <label htmlFor={fieldId} className="mb-1 block text-sm font-medium text-gray-700">
         {label}
       </label>
       <input

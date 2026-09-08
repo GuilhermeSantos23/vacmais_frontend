@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import vacmaisLogo from '../../assets/vacmais-logo.png';
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -12,11 +11,9 @@ function AuthLayout({ children }: AuthLayoutProps) {
       <div className="flex flex-col justify-between gap-10 bg-emerald-950 px-6 py-8 text-white sm:px-10 sm:py-10 lg:w-[45%] lg:px-12 lg:py-12">
         <div>
           <div className="flex items-center gap-2">
-            <img
-              src={vacmaisLogo}
-              alt="Logo Vac+"
-              className="h-9 w-9 rounded-lg object-contain"
-            />
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-300 text-lg font-bold text-emerald-950">
+              +
+            </span>
             <span className="text-lg font-bold">Vac+</span>
           </div>
           <p className="mt-1 text-xs font-semibold tracking-widest text-emerald-300">
