@@ -3,26 +3,36 @@ import {
   AppstoreOutlined,
   MedicineBoxOutlined,
   BankOutlined,
-  EnvironmentOutlined,
   InboxOutlined,
   SettingOutlined,
   LogoutOutlined,
 } from '@ant-design/icons';
 
 export interface NavItem {
+  key: string;
   label: string;
   icon: ReactNode;
+  path: string;
 }
 
 export const mainNavItems: NavItem[] = [
-  { label: 'Dashboard', icon: <AppstoreOutlined /> },
-  { label: 'UBSs', icon: <MedicineBoxOutlined /> },
-  { label: 'Clínicas Privadas', icon: <BankOutlined /> },
-  { label: 'Regiões', icon: <EnvironmentOutlined /> },
-  { label: 'Estoque Regional', icon: <InboxOutlined /> },
+  { key: 'dashboard', label: 'Dashboard', icon: <AppstoreOutlined />, path: '/dashboard' },
+  { key: 'ubs', label: 'UBSs', icon: <MedicineBoxOutlined />, path: '/ubs' },
+  {
+    key: 'clinicas-privadas',
+    label: 'Clínicas Privadas',
+    icon: <BankOutlined />,
+    path: '/clinicas-privadas',
+  },
+  {
+    key: 'estoque',
+    label: 'Estoque Regional',
+    icon: <InboxOutlined />,
+    path: '/estoque-regional',
+  },
 ];
 
 export const bottomNavItems: NavItem[] = [
-  { label: 'Configurações', icon: <SettingOutlined /> },
-  { label: 'Sair', icon: <LogoutOutlined /> },
+  { key: 'configuracoes', label: 'Configurações', icon: <SettingOutlined />, path: '/configuracoes' },
+  { key: 'sair', label: 'Sair', icon: <LogoutOutlined />, path: '/login' },
 ];
