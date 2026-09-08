@@ -1,8 +1,10 @@
+import { NavLink } from 'react-router-dom';
 import vacmaisLogo from '../../../assets/vacmais-logo.png';
 import { mainNavItems, bottomNavItems } from '../navItems';
 
 const linkClassName =
   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-emerald-100 hover:bg-emerald-900 hover:text-white';
+const activeLinkClassName = 'bg-emerald-900 text-white';
 
 function Sidebar() {
   return (
@@ -25,11 +27,16 @@ function Sidebar() {
       <nav className="flex-1 overflow-y-auto px-3">
         <ul className="flex flex-col gap-1">
           {mainNavItems.map((item) => (
-            <li key={item.label}>
-              <a href="#" className={linkClassName}>
+            <li key={item.key}>
+              <NavLink
+                to={item.path}
+                className={({ isActive }) =>
+                  `${linkClassName} ${isActive ? activeLinkClassName : ''}`
+                }
+              >
                 <span className="text-base">{item.icon}</span>
                 {item.label}
-              </a>
+              </NavLink>
             </li>
           ))}
         </ul>
@@ -38,11 +45,16 @@ function Sidebar() {
       <div className="border-t border-emerald-800 px-3 py-4">
         <ul className="flex flex-col gap-1">
           {bottomNavItems.map((item) => (
-            <li key={item.label}>
-              <a href="#" className={linkClassName}>
+            <li key={item.key}>
+              <NavLink
+                to={item.path}
+                className={({ isActive }) =>
+                  `${linkClassName} ${isActive ? activeLinkClassName : ''}`
+                }
+              >
                 <span className="text-base">{item.icon}</span>
                 {item.label}
-              </a>
+              </NavLink>
             </li>
           ))}
         </ul>

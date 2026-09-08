@@ -1,5 +1,6 @@
 import { Drawer } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
+import { NavLink } from 'react-router-dom';
 import { bottomNavItems } from '../navItems';
 
 interface HamburguerMenuProps {
@@ -33,11 +34,11 @@ function HamburguerMenu({ open, onClose }: HamburguerMenuProps) {
     >
       <ul className="flex flex-col gap-1">
         {bottomNavItems.map((item) => (
-          <li key={item.label}>
-            <a href="#" onClick={onClose} className={itemClassName}>
+          <li key={item.key}>
+            <NavLink to={item.path} onClick={onClose} className={itemClassName}>
               <span className="text-base !text-emerald-100">{item.icon}</span>
               <span className="!text-emerald-100">{item.label}</span>
-            </a>
+            </NavLink>
           </li>
         ))}
       </ul>

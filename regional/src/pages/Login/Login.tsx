@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '../../layouts/AuthLayout/AuthLayout';
 import FormField from '../../components/form/FormField/FormField';
 import ValidationOverlay from '../../components/common/ValidationOverlay/ValidationOverlay';
@@ -11,15 +12,12 @@ interface LoginErrors {
 
 type ValidationStep = 'idle' | 'validating' | 'success';
 
-interface LoginProps {
-  onLoginSuccess: () => void;
-}
-
-function Login({ onLoginSuccess }: LoginProps) {
+function Login() {
   const [cpf, setCpf] = useState('');
   const [senha, setSenha] = useState('');
   const [errors, setErrors] = useState<LoginErrors>({});
   const [validationStep, setValidationStep] = useState<ValidationStep>('idle');
+  const navigate = useNavigate();
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,10 +40,10 @@ function Login({ onLoginSuccess }: LoginProps) {
     }
 
     if (validationStep === 'success') {
-      const timer = setTimeout(() => onLoginSuccess(), 800);
+      const timer = setTimeout(() => navigate('/clinicas-privadas'), 800);
       return () => clearTimeout(timer);
     }
-  }, [validationStep, onLoginSuccess]);
+  }, [validationStep, navigate]);
 
   return (
     <AuthLayout>
@@ -80,9 +78,9 @@ function Login({ onLoginSuccess }: LoginProps) {
             error={errors.senha}
           />
 
-          <a href="#" className="text-sm text-emerald-700 hover:underline">
+          <Link to="/esqueci-senha" className="text-sm text-emerald-700 hover:underline">
             Esqueci minha senha
-          </a>
+          </Link>
 
           <button
             type="submit"
