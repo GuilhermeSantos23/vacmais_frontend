@@ -16,8 +16,18 @@ export interface NavItem {
 }
 
 export const mainNavItems: NavItem[] = [
-  { key: 'dashboard', label: 'Dashboard', icon: <AppstoreOutlined />, path: '/dashboard' },
-  { key: 'ubs', label: 'UBSs', icon: <MedicineBoxOutlined />, path: '/ubs' },
+  {
+    key: 'dashboard',
+    label: 'Dashboard',
+    icon: <AppstoreOutlined />,
+    path: '/dashboard',
+  },
+  {
+    key: 'ubs',
+    label: 'UBSs',
+    icon: <MedicineBoxOutlined />,
+    path: '/ubs',
+  },
   {
     key: 'clinicas-privadas',
     label: 'Clínicas Privadas',
@@ -25,14 +35,24 @@ export const mainNavItems: NavItem[] = [
     path: '/clinicas-privadas',
   },
   {
-    key: 'estoque',
-    label: 'Estoque Regional',
+    key: 'relatorio-regional',
+    label: 'Relatório Regional',
     icon: <InboxOutlined />,
-    path: '/estoque-regional',
+    path: '/relatorio-regional',
   },
 ];
 
 export const bottomNavItems: NavItem[] = [
-  { key: 'configuracoes', label: 'Configurações', icon: <SettingOutlined />, path: '/configuracoes' },
-  { key: 'sair', label: 'Sair', icon: <LogoutOutlined />, path: '/login' },
+  {
+    key: 'configuracoes',
+    label: 'Configurações',
+    icon: <SettingOutlined />,
+    path: '/configuracoes',
+  },
+  {
+    key: 'sair',
+    label: 'Sair',
+    icon: <LogoutOutlined />,
+    path: '/login',
+  },
 ];
