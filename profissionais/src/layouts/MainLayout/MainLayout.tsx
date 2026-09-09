@@ -11,19 +11,23 @@ interface MainLayoutProps {
 // UserProvider fica aqui porque o MainLayout é montado uma única vez para
 // toda a área logada (as rotas internas só trocam o conteúdo do <main>),
 // então o nome/avatar do usuário continuam os mesmos ao navegar entre as
-// Pages. O id="app-content" no <main> é usado pelo controle de Brilho em
-// Preferências (ver PreferencesTab) para não quebrar o position:fixed do
-// BottomNavigation.
+// Pages.
+//
+// O layout usa altura fixa de tela (h-screen + overflow-hidden) e só o
+// <main> rola internamente (overflow-y-auto). Assim o <body> sempre tem
+// exatamente o tamanho da viewport, e o controle de Brilho em Preferências
+// pode aplicar o filtro no <body> inteiro (como exigido) sem quebrar o
+// position:fixed da BottomNavigation.
 function MainLayout({ children }: MainLayoutProps) {
   return (
     <UserProvider>
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex h-screen overflow-hidden bg-gray-50">
         <Sidebar />
 
-        <div className="flex min-h-screen flex-1 flex-col">
+        <div className="flex flex-1 flex-col overflow-hidden">
           <Header />
 
-          <main id="app-content" className="flex-1 px-4 py-6 pb-24 lg:px-8 lg:pb-6">
+          <main className="flex-1 overflow-y-auto px-4 py-6 pb-24 lg:px-10 lg:py-8 lg:pb-8">
             {children}
           </main>
 

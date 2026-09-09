@@ -3,13 +3,10 @@ import { Switch, Slider } from 'antd';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
 
 // As três preferências desta aba são só do frontend por enquanto,
-// então usam localStorage em vez de backend, como pedido.
+// então usam localStorage em vez de backend.
 function PreferencesTab() {
   const [darkMode, setDarkMode] = useLocalStorage('vacmais:darkMode', false);
-  const [brightness, setBrightness] = useLocalStorage(
-    'vacmais:brightness',
-    100,
-  );
+  const [brightness, setBrightness] = useLocalStorage('vacmais:brightness', 100);
   const [audioDescription, setAudioDescription] = useLocalStorage(
     'vacmais:audioDescription',
     false,
@@ -19,49 +16,32 @@ function PreferencesTab() {
     document.documentElement.classList.toggle('dark', darkMode);
   }, [darkMode]);
 
-  // Aplica o brilho escolhido apenas no conteúdo da página (#app-content),
-  // nunca no <body> inteiro. Um filtro CSS em um elemento "pai" quebra o
-  // position:fixed dos elementos dentro dele (a BottomNavigation passaria
-  // a se posicionar em relação a esse elemento em vez da tela). Como
-  // <main> não contém nenhum elemento fixed, aplicar o filtro nele é seguro.
+  // Aplica o brilho globalmente, no <body> inteiro (e não só em uma div),
+  // para afetar a tela toda. O MainLayout usa altura fixa de tela
+  // (h-screen) com rolagem apenas dentro do conteúdo, então o <body>
+  // sempre corresponde exatamente à viewport — por isso o filtro aqui não
+  // quebra o position:fixed da BottomNavigation.
   useEffect(() => {
-    const content = document.getElementById('app-content');
-    if (!content) return;
-
-    content.style.filter = brightness === 100 ? '' : `brightness(${brightness}%)`;
+    document.body.style.filter = brightness === 100 ? '' : `brightness(${brightness}%)`;
   }, [brightness]);
 
   return (
     <div className="rounded-lg border border-gray-100 bg-white p-5 shadow-sm">
-      <h2 className="text-sm font-bold tracking-wide text-gray-800">
-        Preferências do Sistema
-      </h2>
+      <h2 className="text-sm font-bold tracking-wide text-gray-800">Preferências do Sistema</h2>
 
       <div className="mt-4 flex flex-col gap-4">
         <div className="flex items-center justify-between rounded-lg border border-gray-100 p-4">
           <span className="text-sm font-medium text-gray-700">Tema claro</span>
-          <Switch
-            checked={!darkMode}
-            onChange={(checked) => setDarkMode(!checked)}
-          />
+          <Switch checked={!darkMode} onChange={(checked) => setDarkMode(!checked)} />
         </div>
 
         <div className="rounded-lg border border-gray-100 p-4">
-          <span className="mb-2 block text-sm font-medium text-gray-700">
-            Brilho
-          </span>
-          <Slider
-            min={50}
-            max={150}
-            value={brightness}
-            onChange={setBrightness}
-          />
+          <span className="mb-2 block text-sm font-medium text-gray-700">Brilho</span>
+          <Slider min={50} max={150} value={brightness} onChange={setBrightness} />
         </div>
 
         <div className="flex items-center justify-between rounded-lg border border-gray-100 p-4">
-          <span className="text-sm font-medium text-gray-700">
-            Áudio-descrição
-          </span>
+          <span className="text-sm font-medium text-gray-700">Áudio-descrição</span>
           <Switch checked={audioDescription} onChange={setAudioDescription} />
         </div>
       </div>

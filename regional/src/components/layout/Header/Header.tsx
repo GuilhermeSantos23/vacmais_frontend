@@ -11,7 +11,7 @@ interface HeaderProps {
 
 function Header({
   onMenuClick,
-  adminName = 'Dra. Carla Ribeiro',
+  adminName = 'Carla Ribeiro',
   adminRole = 'Admin. Regional',
   regiaoLabel = 'Região: Centro-Sul/SP',
 }: HeaderProps) {

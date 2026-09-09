@@ -1,15 +1,12 @@
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-  Outlet,
-} from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout/MainLayout';
 import Login from '../pages/Login/Login';
 import EsqueciSenha from '../pages/EsqueciSenha/EsqueciSenha';
 import Home from '../pages/home/Home';
 import Settings from '../pages/Settings/Settings';
+import Caderneta from '../pages/Caderneta/Caderneta';
+import Aplicacoes from '../pages/Aplicacoes/Aplicacoes';
+import Historico from '../pages/Historico/Historico';
 
 // Rota de layout: tudo que for uma página "logada" é renderizado dentro
 // do MainLayout, através do <Outlet />. Como o MainLayout só é montado
@@ -32,6 +29,9 @@ function AppRoutes() {
 
         <Route element={<AreaLogada />}>
           <Route path="/home" element={<Home />} />
+          <Route path="/cadernetas" element={<Caderneta />} />
+          <Route path="/aplicacoes" element={<Aplicacoes />} />
+          <Route path="/historico" element={<Historico />} />
           <Route path="/configuracoes" element={<Settings />} />
         </Route>
 

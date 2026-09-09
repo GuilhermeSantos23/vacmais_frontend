@@ -17,17 +17,7 @@ function AvatarPickerModal({ open, onClose }: AvatarPickerModalProps) {
   }
 
   return (
-    <Modal
-      title="Escolha seu avatar"
-      open={open}
-      onCancel={onClose}
-      footer={null}
-    >
-      <p className="mb-4 text-sm text-gray-500">
-        Avatares temporários — em breve teremos as ilustrações exclusivas do
-        Vac+.
-      </p>
-
+    <Modal title="Escolha seu avatar" open={open} onCancel={onClose} footer={null}>
       <div className="grid grid-cols-4 gap-3 sm:grid-cols-5">
         {AVATAR_OPTIONS.map((avatar) => {
           const isSelected = avatar.id === avatarId;
