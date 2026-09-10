@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '../../layouts/AuthLayout/AuthLayout';
 import FormField from '../../components/form/FormField/FormField';
 import ValidationOverlay from '../../components/common/ValidationOverlay/ValidationOverlay';
@@ -16,6 +17,8 @@ function Login() {
   const [senha, setSenha] = useState('');
   const [errors, setErrors] = useState<LoginErrors>({});
   const [validationStep, setValidationStep] = useState<ValidationStep>('idle');
+
+  const navigate = useNavigate();
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -38,10 +41,10 @@ function Login() {
     }
 
     if (validationStep === 'success') {
-      const timer = setTimeout(() => setValidationStep('idle'), 1200);
+      const timer = setTimeout(() => navigate('/dashboard'), 800);
       return () => clearTimeout(timer);
     }
-  }, [validationStep]);
+  }, [validationStep, navigate]);
 
   return (
     <AuthLayout>
@@ -76,9 +79,9 @@ function Login() {
             error={errors.senha}
           />
 
-          <a href="#" className="text-sm text-gray-500 hover:underline">
+          <Link to="/esqueci-senha" className="text-sm text-gray-500 hover:underline">
             Esqueci minha senha
-          </a>
+          </Link>
 
           <button
             type="submit"

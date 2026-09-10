@@ -1,12 +1,7 @@
-import MainLayout from './layouts/MainLayout/MainLayout';
-import Estoque from './pages/Estoque/Estoque';
+import AppRoutes from './routes/AppRoutes';
 
 function App() {
-  return (
-    <MainLayout>
-      <Estoque />
-    </MainLayout>
-  );
+  return <AppRoutes />;
 }
 
 export default App;

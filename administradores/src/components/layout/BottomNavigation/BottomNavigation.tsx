@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { mainNavItems } from '../navItems';
 
 const itemClassName =
@@ -9,10 +10,10 @@ function BottomNavigation() {
       <ul className="flex justify-between px-1 py-1">
         {mainNavItems.map((item) => (
           <li key={item.label} className="flex-1">
-            <a href="#" className={itemClassName}>
+            <Link to={item.path} className={itemClassName}>
               <span className="text-base">{item.icon}</span>
               {item.label}
-            </a>
+            </Link>
           </li>
         ))}
       </ul>
