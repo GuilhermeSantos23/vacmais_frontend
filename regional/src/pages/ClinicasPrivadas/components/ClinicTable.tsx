@@ -71,10 +71,10 @@ function ClinicTable({ clinics, loading, onSelectClinic }: ClinicTableProps) {
       pagination={{
         current: page,
         pageSize: PAGE_SIZE,
-        onChange: (nextPage) => setPage(nextPage),
+        onChange: (nextPage: number) => setPage(nextPage),
       }}
       scroll={{ x: true }}
-      onRow={(clinic) => ({
+      onRow={(clinic: Clinic) => ({
         onClick: () => onSelectClinic(clinic),
         className: 'cursor-pointer',
       })}

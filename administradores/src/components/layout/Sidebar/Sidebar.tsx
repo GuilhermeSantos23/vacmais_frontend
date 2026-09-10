@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import vacmaisLogo from '../../../assets/vacmais-logo.png';
 import { mainNavItems, bottomNavItems } from '../navItems';
 
@@ -5,8 +6,8 @@ import { mainNavItems, bottomNavItems } from '../navItems';
 // usuario/src/components/layout/Sidebar: logo no topo, navegação principal
 // rolável e uma área inferior fixa. Único destaque é o hover (igual lá) —
 // não existe estado de "item ativo". Os itens em si são próprios da área
-// administrativa e nenhuma das páginas existe ainda, por isso todos usam
-// <a href="#">, o mesmo padrão usado lá para itens sem página.
+// administrativa; cada um navega para sua rota (item.path) definida em
+// navItems.tsx.
 const linkClassName =
   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-emerald-100 hover:bg-emerald-900 hover:text-white';
 
@@ -32,10 +33,10 @@ function Sidebar() {
         <ul className="flex flex-col gap-1">
           {mainNavItems.map((item) => (
             <li key={item.label}>
-              <a href="#" className={linkClassName}>
+              <Link to={item.path} className={linkClassName}>
                 <span className="text-base">{item.icon}</span>
                 {item.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
@@ -45,10 +46,10 @@ function Sidebar() {
         <ul className="flex flex-col gap-1">
           {bottomNavItems.map((item) => (
             <li key={item.label}>
-              <a href="#" className={linkClassName}>
+              <Link to={item.path} className={linkClassName}>
                 <span className="text-base">{item.icon}</span>
                 {item.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>

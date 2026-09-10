@@ -99,10 +99,10 @@ function UBSTable({ ubsList, loading, onEditUBS, onDeleteUBS }: UBSTableProps) {
       pagination={{
         current: page,
         pageSize: PAGE_SIZE,
-        onChange: (nextPage) => setPage(nextPage),
+        onChange: (nextPage: number) => setPage(nextPage),
       }}
       scroll={{ x: true }}
-      onRow={(ubs) => ({
+      onRow={(ubs: UBS) => ({
         onClick: () => onEditUBS(ubs),
         className: 'cursor-pointer',
       })}

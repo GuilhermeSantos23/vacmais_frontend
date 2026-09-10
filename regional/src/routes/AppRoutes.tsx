@@ -15,7 +15,6 @@ import ClinicasPrivadas from '../pages/ClinicasPrivadas/ClinicasPrivadas';
 import UBSs from '../pages/UBSs/UBSs';
 import Settings from '../pages/Settings/Settings';
 import RelatorioRegional from '../pages/RelatorioRegional/RelatorioRegional';
-import ComingSoon from '../pages/ComingSoon/ComingSoon';
 
 function AreaLogada() {
   return (
@@ -44,13 +43,6 @@ function AppRoutes() {
 
         {/* Área logada */}
         <Route element={<AreaLogada />}>
-<<<<<<< HEAD
-          <Route path="/clinicas-privadas" element={<ClinicasPrivadas />} />
-          <Route path="/dashboard" element={<ComingSoon title="Dashboard" />} />
-          <Route path="/ubs" element={<UBSs />} />
-          <Route path="/estoque-regional" element={<ComingSoon title="Estoque Regional" />} />
-          <Route path="/configuracoes" element={<Settings />} />
-=======
 
           {/* DASHBOARD */}
           <Route
@@ -58,16 +50,16 @@ function AppRoutes() {
             element={<Dashboard />}
           />
 
+          {/* UBSs */}
+          <Route
+            path="/ubs"
+            element={<UBSs />}
+          />
+
           {/* Clínicas privadas */}
           <Route
             path="/clinicas-privadas"
             element={<ClinicasPrivadas />}
-          />
-
-          {/* UBSs */}
-          <Route
-            path="/ubs"
-            element={<ComingSoon title="UBSs" />}
           />
 
           {/* Relatório Regional */}
@@ -82,7 +74,6 @@ function AppRoutes() {
             element={<Settings />}
           />
 
->>>>>>> 0d663a4f89d97164c75cfb5d3d12aa5f291d2250
         </Route>
 
         {/* Página inicial */}

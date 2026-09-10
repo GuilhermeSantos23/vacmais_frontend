@@ -1,12 +1,7 @@
-import MainLayout from './layouts/MainLayout/MainLayout';
-import Campanhas from './pages/Campanhas/Campanhas';
+import AppRoutes from './routes/AppRoutes';
 
 function App() {
-  return (
-    <MainLayout>
-      <Campanhas />
-    </MainLayout>
-  );
+  return <AppRoutes />;
 }
 
 export default App;
