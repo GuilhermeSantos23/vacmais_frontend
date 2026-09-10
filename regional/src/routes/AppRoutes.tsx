@@ -3,6 +3,7 @@ import MainLayout from '../layouts/MainLayout/MainLayout';
 import Login from '../pages/Login/Login';
 import EsqueciSenha from '../pages/EsqueciSenha/EsqueciSenha';
 import ClinicasPrivadas from '../pages/ClinicasPrivadas/ClinicasPrivadas';
+import UBSs from '../pages/UBSs/UBSs';
 import Settings from '../pages/Settings/Settings';
 import ComingSoon from '../pages/ComingSoon/ComingSoon';
 
@@ -28,7 +29,7 @@ function AppRoutes() {
         <Route element={<AreaLogada />}>
           <Route path="/clinicas-privadas" element={<ClinicasPrivadas />} />
           <Route path="/dashboard" element={<ComingSoon title="Dashboard" />} />
-          <Route path="/ubs" element={<ComingSoon title="UBSs" />} />
+          <Route path="/ubs" element={<UBSs />} />
           <Route path="/estoque-regional" element={<ComingSoon title="Estoque Regional" />} />
           <Route path="/configuracoes" element={<Settings />} />
         </Route>
