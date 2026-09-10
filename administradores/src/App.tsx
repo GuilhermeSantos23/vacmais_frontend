@@ -1,10 +1,10 @@
 import MainLayout from './layouts/MainLayout/MainLayout';
-import Estoque from './pages/Estoque/Estoque';
+import Campanhas from './pages/Campanhas/Campanhas';
 
 function App() {
   return (
     <MainLayout>
-      <Estoque />
+      <Campanhas />
     </MainLayout>
   );
 }

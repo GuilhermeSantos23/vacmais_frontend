@@ -14,6 +14,7 @@ import Dashboard from '../pages/Dashboard/Dashboard';
 import ClinicasPrivadas from '../pages/ClinicasPrivadas/ClinicasPrivadas';
 import UBSs from '../pages/UBSs/UBSs';
 import Settings from '../pages/Settings/Settings';
+import RelatorioRegional from '../pages/RelatorioRegional/RelatorioRegional';
 import ComingSoon from '../pages/ComingSoon/ComingSoon';
 
 function AreaLogada() {
@@ -69,10 +70,10 @@ function AppRoutes() {
             element={<ComingSoon title="UBSs" />}
           />
 
-          {/* Estoque Regional */}
+          {/* Relatório Regional */}
           <Route
-            path="/estoque-regional"
-            element={<ComingSoon title="Estoque Regional" />}
+            path="/relatorio-regional"
+            element={<RelatorioRegional />}
           />
 
           {/* Configurações */}

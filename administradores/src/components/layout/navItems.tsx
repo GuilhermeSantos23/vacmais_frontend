@@ -6,6 +6,7 @@ import {
   SwapOutlined,
   SettingOutlined,
   LogoutOutlined,
+  NotificationOutlined,
 } from '@ant-design/icons';
 
 export interface NavItem {
@@ -18,6 +19,7 @@ export const mainNavItems: NavItem[] = [
   { label: 'Profissionais', icon: <TeamOutlined /> },
   { label: 'Estoque', icon: <InboxOutlined /> },
   { label: 'Movimentações', icon: <SwapOutlined /> },
+  { label: 'Campanhas & Alertas', icon: <NotificationOutlined /> },
 ];
 
 export const bottomNavItems: NavItem[] = [
