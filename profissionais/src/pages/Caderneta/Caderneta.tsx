@@ -298,7 +298,7 @@ function Caderneta() {
       : Boolean(vacinaId && justificativaNaoRealizada.trim()));
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="w-full max-w-5xl">
       <p className="text-sm text-gray-500">Cadernetas</p>
       <h1 className="text-2xl font-bold text-gray-800">
         {patient?.hasCaderneta ? 'Alteração de caderneta' : 'Cadastro de caderneta'}

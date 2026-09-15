@@ -17,12 +17,10 @@ function Header({
 }: HeaderProps) {
   const today = formatFullDate(new Date());
   const initials = adminName
-    .split(' ')
-    .filter((word) => word.length > 0 && word[0] === word[0].toUpperCase())
-    .slice(0, 2)
-    .map((word) => word.charAt(0))
-    .join('')
-    .toUpperCase();
+  .replace('Ass.', '')
+  .trim()
+  .charAt(0)
+  .toUpperCase();
 
   return (
     <header className="flex items-center gap-3 border-b border-gray-200 bg-white px-4 py-3 lg:px-8">

@@ -247,7 +247,7 @@ function Aplicacoes() {
   );
 
   return (
-    <div className="mx-auto max-w-3xl">
+  <div className="w-full max-w-5xl">
       <div className="mb-10 sm:mb-14">
         <p className="text-sm text-gray-500">Aplicações</p>
         <h1 className="text-2xl font-bold text-gray-800">Registro e acompanhamento de aplicações</h1>
