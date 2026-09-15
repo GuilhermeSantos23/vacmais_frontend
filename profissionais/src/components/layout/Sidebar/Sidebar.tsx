@@ -39,21 +39,18 @@ function Sidebar() {
     <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col bg-emerald-950 text-emerald-50 lg:flex">
       {/* Logo */}
       <div className="px-6 py-6">
-        <div className="flex items-center gap-3">
-          <img
-            src={logo}
-            alt="Logo vac+"
-            className="h-10 w-10 object-contain"
-          />
-
-          <div>
+          <div className="flex items-center gap-2">
+            <img
+              src={logo}
+              alt="Logo vac+"
+              className="h-8 w-8 rounded-lg object-contain"
+            />
             <span className="text-lg font-bold">Vac+</span>
-
-            <p className="mt-1 text-xs font-semibold tracking-widest text-emerald-300">
-              PROFISSIONAIS
-            </p>
           </div>
-        </div>
+
+          <p className="mt-1 text-xs font-semibold tracking-widest text-emerald-300">
+            PROFISSIONAIS
+          </p>
       </div>
 
       {/* Navegação principal */}
