@@ -7,7 +7,7 @@ interface AuthLayoutProps {
 
 function AuthLayout({ children }: AuthLayoutProps) {
   return (
-    <div className="flex min-h-screen flex-col lg:flex-row">
+    <div className="flex min-h-dvh flex-col lg:flex-row">
       {/* Painel institucional */}
       <div className="flex flex-col justify-between gap-10 bg-emerald-950 px-6 py-8 text-white sm:px-10 sm:py-10 lg:w-[45%] lg:px-12 lg:py-12">
         <div>
