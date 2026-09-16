@@ -2,6 +2,7 @@ import type {
   Clinic,
   ClinicFormData,
   ClinicSearchCriterion,
+  ClinicStatus,
 } from '../types/clinic';
 import { CURRENT_REGIONAL_ADMIN } from '../mocks/session';
 import { onlyDigits } from '../utils/masks';
@@ -423,20 +424,36 @@ export function getClinicById(id: string): Promise<Clinic | null> {
 }
 
 export function getClinicStats(): Promise<{
+  total: number;
+  operando: number;
+  interditada: number;
+  fechada: number;
+  operacoesEncerradas: number;
   totalClinics: number;
   totalAdministrators: number;
   closedClinics: number;
 }> {
+  function countByStatus(status: ClinicStatus): number {
+    return mockClinics.filter((clinic) => clinic.status === status).length;
+  }
+
   const totalClinics = mockClinics.length;
   const totalAdministrators = mockClinics.reduce(
     (sum, clinic) => sum + clinic.administrators.length,
     0,
   );
-  const closedClinics = mockClinics.filter(
-    (clinic) => clinic.status === 'fechada',
-  ).length;
+  const closedClinics = countByStatus('fechada');
 
-  return delay({ totalClinics, totalAdministrators, closedClinics });
+  return delay({
+    total: totalClinics,
+    operando: countByStatus('operando'),
+    interditada: countByStatus('interditada'),
+    fechada: countByStatus('fechada'),
+    operacoesEncerradas: countByStatus('operacoes_encerradas'),
+    totalClinics,
+    totalAdministrators,
+    closedClinics,
+  });
 }
 
 /**
@@ -527,4 +544,14 @@ export function updateClinic(
   ];
 
   return delay(updated, 700);
+}
+
+/**
+ * Remove uma clínica.
+ * TODO(backend): substituir corpo por DELETE /clinicas/{id}.
+ */
+export function deleteClinic(id: string): Promise<boolean> {
+  const existedBefore = mockClinics.some((clinic) => clinic.id === id);
+  mockClinics = mockClinics.filter((clinic) => clinic.id !== id);
+  return delay(existedBefore, 400);
 }

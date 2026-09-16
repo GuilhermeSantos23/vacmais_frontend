@@ -195,7 +195,6 @@ function ClinicForm({
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField
             label="Nome da clínica"
-            className="sm:col-span-2"
             value={formData.name}
             onChange={(e) => updateField('name', e.target.value)}
             error={errors.name}
@@ -222,16 +221,17 @@ function ClinicForm({
             )}
           </div>
           <FormField
-            label="Logradouro"
-            value={formData.street}
-            onChange={(e) => updateField('street', e.target.value)}
-            error={errors.street}
-          />
-          <FormField
             label="Número"
             value={formData.number}
             onChange={(e) => updateField('number', e.target.value)}
             error={errors.number}
+          />
+          <FormField
+            label="Logradouro"
+            className="sm:col-span-2"
+            value={formData.street}
+            onChange={(e) => updateField('street', e.target.value)}
+            error={errors.street}
           />
           <FormField
             label="Cidade"
