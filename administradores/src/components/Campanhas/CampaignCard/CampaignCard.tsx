@@ -1,81 +1,47 @@
-import { CalendarOutlined, EnvironmentOutlined, PictureOutlined } from '@ant-design/icons';
-import type { Campaign, CampaignStatus as CampaignStatusType } from '../../../types/campaign';
+import { CalendarOutlined, EditOutlined } from '@ant-design/icons';
+import type { Campaign } from '../../../types/campaign';
 import { formatDateBR } from '../../../utils/date';
 import CampaignStatus from '../CampaignStatus/CampaignStatus';
 
 interface CampaignCardProps {
   campaign: Campaign;
   onEdit: (campaign: Campaign) => void;
-  onChangeStatus: (campaign: Campaign, status: CampaignStatusType) => void;
 }
 
-const statusOptions: { value: CampaignStatusType; label: string }[] = [
-  { value: 'ativa', label: 'Ativa' },
-  { value: 'agendada', label: 'Agendada' },
-  { value: 'encerrada', label: 'Encerrada' },
-];
-
-function CampaignCard({ campaign, onEdit, onChangeStatus }: CampaignCardProps) {
+// Card compacto: só o essencial para identificar a campanha e seu prazo.
+// Sem imagem e sem local, já que a campanha pertence à unidade do
+// administrador logado.
+function CampaignCard({ campaign, onEdit }: CampaignCardProps) {
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-gray-100 bg-white p-5 shadow-sm sm:flex-row">
-      <div className="h-28 w-full shrink-0 overflow-hidden rounded-lg bg-emerald-50 sm:h-28 sm:w-28">
-        {campaign.image ? (
-          <img src={campaign.image} alt={campaign.title} className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-2xl text-emerald-300">
-            <PictureOutlined />
-          </div>
-        )}
-      </div>
+    <div className="flex h-full flex-col rounded-lg border border-gray-200 bg-white p-4">
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="font-semibold text-gray-900">{campaign.title}</h3>
 
-      <div className="flex flex-1 flex-col">
-        <h3 className="text-lg font-bold text-gray-900">{campaign.title}</h3>
-
-        <div className="mt-1 flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <CampaignStatus status={campaign.status} />
-
-          <select
-            aria-label="Alterar status da campanha"
-            value={campaign.status}
-            onChange={(e) => onChangeStatus(campaign, e.target.value as CampaignStatusType)}
-            className="rounded-md border border-gray-200 bg-white px-2 py-0.5 text-xs text-gray-500 outline-none focus:border-emerald-500"
-          >
-            {statusOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <p className="mt-2 line-clamp-2 text-sm text-gray-500">{campaign.description}</p>
-
-        <div className="mt-3 flex flex-col gap-1.5 text-sm text-gray-600">
-          <div className="flex items-center gap-2">
-            <CalendarOutlined className="text-gray-400" />
-            <span>Publicada: {formatDateBR(campaign.publishedAt)}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <CalendarOutlined className="text-gray-400" />
-            <span>Até: {formatDateBR(campaign.endDate)}</span>
-          </div>
-          {campaign.locations.length > 0 && (
-            <div className="flex items-center gap-2">
-              <EnvironmentOutlined className="text-gray-400" />
-              <span>{campaign.locations.map((unit) => unit.name).join(', ')}</span>
-            </div>
-          )}
-        </div>
-
-        <div className="mt-4 flex justify-end">
           <button
             type="button"
             onClick={() => onEdit(campaign)}
-            className="text-sm font-medium text-emerald-600 hover:text-emerald-700"
+            aria-label="Editar campanha"
+            title="Editar campanha"
+            className="text-gray-400 hover:text-emerald-700"
           >
-            Editar
+            <EditOutlined />
           </button>
         </div>
+      </div>
+
+      <p className="mt-1 line-clamp-2 text-sm text-gray-500">{campaign.description}</p>
+
+      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
+        <span className="flex items-center gap-1.5">
+          <CalendarOutlined className="text-gray-400" />
+          Publicada: {formatDateBR(campaign.publishedAt)}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <CalendarOutlined className="text-gray-400" />
+          Encerra: {formatDateBR(campaign.endDate)}
+        </span>
       </div>
     </div>
   );

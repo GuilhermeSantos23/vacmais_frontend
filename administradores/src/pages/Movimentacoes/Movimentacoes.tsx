@@ -1,152 +1,179 @@
-import { useState } from 'react';
-import { SearchOutlined } from '@ant-design/icons';
-
-// Tipos de movimentação possíveis na tabela.
-type TipoMovimentacao = 'Entrada' | 'Alteração';
-
-interface Movimentacao {
-  tipo: TipoMovimentacao;
-  lote: string;
-  fabricante: string;
-  validade: string;
-  responsavel: string;
-  quantidade: number;
-  data: string;
-}
-
-// Dados fictícios apenas para reproduzir a interface visual.
-const movimentacoes: Movimentacao[] = [
-  {
-    tipo: 'Entrada',
-    lote: 'FL-2026-014',
-    fabricante: 'Sanofi',
-    validade: '10/2027',
-    responsavel: 'Carla',
-    quantidade: 270,
-    data: '11/11/2026',
-  },
-  {
-    tipo: 'Entrada',
-    lote: '90839',
-    fabricante: 'Butantã',
-    validade: '10/2027',
-    responsavel: 'Vinícius',
-    quantidade: 100,
-    data: '11/11/2026',
-  },
-  {
-    tipo: 'Alteração',
-    lote: '098707',
-    fabricante: 'Pfizer',
-    validade: '10/2027',
-    responsavel: 'Carla',
-    quantidade: 0,
-    data: '11/11/2026',
-  },
-  {
-    tipo: 'Entrada',
-    lote: '048320',
-    fabricante: 'Butantã',
-    validade: '10/2027',
-    responsavel: 'Carla',
-    quantidade: 100,
-    data: '11/11/2026',
-  },
-  {
-    tipo: 'Entrada',
-    lote: 'FA-2026-007',
-    fabricante: 'Pfizer',
-    validade: '10/2027',
-    responsavel: 'Vinícius',
-    quantidade: 100,
-    data: '11/11/2026',
-  },
-];
-
-// Cor do texto de cada tipo de movimentação, conforme a imagem de referência.
-const tipoClassName: Record<TipoMovimentacao, string> = {
-  Entrada: 'text-blue-600 font-medium',
-  Alteração: 'text-orange-500 font-medium',
-};
+import { useEffect, useMemo, useState } from 'react';
+import { Tabs } from 'antd';
+import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
+import MovimentacaoTable from './components/MovimentacaoTable';
+import AplicacaoTable from './components/AplicacaoTable';
+import {
+  getProfissionalFilterOptions,
+  listAplicacoes,
+  listMovimentacoes,
+} from '../../services/movimentacaoService';
+import {
+  MODO_MOVIMENTACAO_OPTIONS,
+  TIPO_MOVIMENTACAO_FILTER_OPTIONS,
+} from '../../utils/movimentacaoOptions';
+import type {
+  AplicacaoDetalhada,
+  ModoMovimentacao,
+  MovimentacaoDetalhada,
+  TipoMovimentacao,
+} from '../../types/movimentacao';
 
 function Movimentacoes() {
-  const [busca, setBusca] = useState('');
+  const [modo, setModo] = useState<ModoMovimentacao>('tipo');
 
-  // Filtra por tipo, lote, fabricante ou responsável conforme o usuário digita.
-  const movimentacoesFiltradas = movimentacoes.filter((mov) => {
-    const termo = busca.trim().toLowerCase();
-    if (!termo) return true;
+  const [movimentacoes, setMovimentacoes] = useState<MovimentacaoDetalhada[]>([]);
+  const [aplicacoes, setAplicacoes] = useState<AplicacaoDetalhada[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-    return (
-      mov.tipo.toLowerCase().includes(termo) ||
-      mov.lote.toLowerCase().includes(termo) ||
-      mov.fabricante.toLowerCase().includes(termo) ||
-      mov.responsavel.toLowerCase().includes(termo)
-    );
-  });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [tipoFilter, setTipoFilter] = useState<TipoMovimentacao | 'todos'>('todos');
+  const [profissionalFilter, setProfissionalFilter] = useState('todos');
+
+  // Mesmo padrão de Estoque/Profissionais: carrega uma vez ao montar a
+  // tela. Os dois relatórios (Tipo e Ação) são pequenos, então os dois são
+  // carregados juntos — trocar de modo só troca qual já foi carregado é
+  // exibido, sem precisar de uma nova requisição.
+  useEffect(() => {
+    async function loadData() {
+      setIsLoading(true);
+      const [movimentacoesResult, aplicacoesResult] = await Promise.all([
+        listMovimentacoes(),
+        listAplicacoes(),
+      ]);
+      setMovimentacoes(movimentacoesResult);
+      setAplicacoes(aplicacoesResult);
+      setIsLoading(false);
+    }
+    loadData();
+  }, []);
+
+  // Trocar de modo limpa os filtros/busca do modo anterior — cada modo tem
+  // seus próprios critérios e eles não fazem sentido misturados.
+  function handleModoChange(novoModo: string) {
+    setModo(novoModo as ModoMovimentacao);
+    setSearchTerm('');
+    setTipoFilter('todos');
+    setProfissionalFilter('todos');
+  }
+
+  const movimentacoesFiltradas = useMemo(() => {
+    const termo = searchTerm.trim().toLowerCase();
+
+    return movimentacoes.filter((mov) => {
+      const combinaTipo = tipoFilter === 'todos' || mov.tipo === tipoFilter;
+      const combinaBusca =
+        !termo ||
+        mov.lote.vaccineName.toLowerCase().includes(termo) ||
+        mov.lote.code.toLowerCase().includes(termo);
+
+      return combinaTipo && combinaBusca;
+    });
+  }, [movimentacoes, searchTerm, tipoFilter]);
+
+  const aplicacoesFiltradas = useMemo(() => {
+    const termo = searchTerm.trim().toLowerCase();
+
+    return aplicacoes.filter((aplicacao) => {
+      const combinaProfissional =
+        profissionalFilter === 'todos' || aplicacao.profissionalId === profissionalFilter;
+      const combinaBusca =
+        !termo ||
+        aplicacao.profissionalNome.toLowerCase().includes(termo) ||
+        aplicacao.lote.vaccineName.toLowerCase().includes(termo) ||
+        aplicacao.lote.code.toLowerCase().includes(termo);
+
+      return combinaProfissional && combinaBusca;
+    });
+  }, [aplicacoes, searchTerm, profissionalFilter]);
+
+  const profissionalOptions = useMemo(() => getProfissionalFilterOptions(aplicacoes), [aplicacoes]);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-900">Movimentações</h1>
-      <p className="mt-1 text-sm text-gray-500">
-        Monitoramento de ações do usuário no estoque
-      </p>
+    <div className="flex flex-col gap-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Movimentações</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Relatório de como os lotes estão se movimentando e de quem está aplicando as vacinas.
+        </p>
+      </div>
 
-      <div className="mt-6 rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-        <div className="flex items-center justify-between gap-4">
-          <h2 className="text-base font-semibold text-gray-900">Ações</h2>
+      <div className="rounded-lg border border-gray-200 bg-white p-4">
+        <Tabs
+          activeKey={modo}
+          onChange={handleModoChange}
+          items={MODO_MOVIMENTACAO_OPTIONS.map((option) => ({
+            key: option.value,
+            label: option.label,
+          }))}
+        />
 
-          <div className="relative w-72">
+        <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center">
+          <div className="relative flex-1">
             <SearchOutlined className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              placeholder="Buscar por vacina, lote..."
-              className="w-full rounded-lg border border-gray-200 py-2 pr-3 pl-9 text-sm text-gray-700 outline-none focus:border-emerald-500"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={
+                modo === 'tipo'
+                  ? 'Buscar por vacina ou lote...'
+                  : 'Buscar por profissional, vacina ou lote...'
+              }
+              className="w-full rounded-lg border border-gray-300 py-2 pr-3 pl-9 text-sm text-gray-700 outline-none focus:border-emerald-500"
             />
           </div>
-        </div>
 
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[720px] border-collapse text-left text-sm">
-            <thead>
-              <tr className="border-b border-gray-100 text-xs tracking-wide text-gray-400 uppercase">
-                <th className="py-2 pr-4 font-medium">Tipo</th>
-                <th className="py-2 pr-4 font-medium">Lote</th>
-                <th className="py-2 pr-4 font-medium">Fabricante</th>
-                <th className="py-2 pr-4 font-medium">Validade</th>
-                <th className="py-2 pr-4 font-medium">Responsável</th>
-                <th className="py-2 pr-4 font-medium">Quantidade</th>
-                <th className="py-2 pr-4 font-medium">Data</th>
-              </tr>
-            </thead>
-            <tbody>
-              {movimentacoesFiltradas.map((mov, index) => (
-                <tr
-                  key={`${mov.lote}-${index}`}
-                  className="border-b border-gray-50 text-gray-700 last:border-0"
-                >
-                  <td className={`py-3 pr-4 ${tipoClassName[mov.tipo]}`}>
-                    {mov.tipo}
-                  </td>
-                  <td className="py-3 pr-4">{mov.lote}</td>
-                  <td className="py-3 pr-4">{mov.fabricante}</td>
-                  <td className="py-3 pr-4">{mov.validade}</td>
-                  <td className="py-3 pr-4">{mov.responsavel}</td>
-                  <td className="py-3 pr-4">{mov.quantidade}</td>
-                  <td className="py-3 pr-4">{mov.data}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {modo === 'tipo' && (
+            <div className="flex items-center gap-2">
+              <FilterOutlined className="text-gray-400" />
+              <label htmlFor="tipo-filter" className="text-sm whitespace-nowrap text-gray-600">
+                Tipo:
+              </label>
+              <select
+                id="tipo-filter"
+                value={tipoFilter}
+                onChange={(e) => setTipoFilter(e.target.value as TipoMovimentacao | 'todos')}
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none focus:border-emerald-500 sm:w-auto"
+              >
+                <option value="todos">Todos</option>
+                {TIPO_MOVIMENTACAO_FILTER_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
-          {movimentacoesFiltradas.length === 0 && (
-            <p className="py-6 text-center text-sm text-gray-400">
-              Nenhuma movimentação encontrada.
-            </p>
+          {modo === 'acao' && (
+            <div className="flex items-center gap-2">
+              <FilterOutlined className="text-gray-400" />
+              <label htmlFor="profissional-filter" className="text-sm whitespace-nowrap text-gray-600">
+                Profissional:
+              </label>
+              <select
+                id="profissional-filter"
+                value={profissionalFilter}
+                onChange={(e) => setProfissionalFilter(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none focus:border-emerald-500 sm:w-auto"
+              >
+                <option value="todos">Todos</option>
+                {profissionalOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           )}
         </div>
+
+        {modo === 'tipo' ? (
+          <MovimentacaoTable movimentacoes={movimentacoesFiltradas} loading={isLoading} />
+        ) : (
+          <AplicacaoTable aplicacoes={aplicacoesFiltradas} loading={isLoading} />
+        )}
       </div>
     </div>
   );
