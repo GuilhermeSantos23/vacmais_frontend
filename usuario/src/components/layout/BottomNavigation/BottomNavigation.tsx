@@ -32,7 +32,10 @@ const itemClassName =
 
 function BottomNavigation() {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white lg:hidden">
+    <nav
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white lg:hidden"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
       <ul className="flex justify-between px-1 py-1">
         {bottomNavItems.map((item) => (
           <li key={item.label} className="flex-1">

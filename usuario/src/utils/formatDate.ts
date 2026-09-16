@@ -12,3 +12,15 @@ export function formatFullDate(date: Date): string {
 
   return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 }
+
+/**
+ * Formata uma data no padrão curto dd/mm/aaaa, usado no popover de
+ * alertas do sino do Header.
+ */
+export function formatShortDate(date: Date): string {
+  return date.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+}

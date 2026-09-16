@@ -1,10 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { CheckCircleOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import AuthLayout from '../../layouts/AuthLayout/AuthLayout';
 import FormField from '../../components/form/FormField/FormField';
 import ValidationOverlay from '../../components/common/ValidationOverlay/ValidationOverlay';
 import { maskCPF } from '../../utils/masks';
+import { useUser } from '../../hooks/useUser';
 
 interface LoginErrors {
   cpf?: string;
@@ -18,7 +19,9 @@ function Login() {
   const [senha, setSenha] = useState('');
   const [errors, setErrors] = useState<LoginErrors>({});
   const [validationStep, setValidationStep] = useState<ValidationStep>('idle');
+  const [mensagemErroLogin, setMensagemErroLogin] = useState('');
 
+  const { login } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
   const cadastroSucesso = Boolean(
@@ -33,22 +36,38 @@ function Login() {
     if (!senha.trim()) novosErros.senha = 'Senha é obrigatória.';
 
     setErrors(novosErros);
+    setMensagemErroLogin('');
 
     if (Object.keys(novosErros).length === 0) {
       setValidationStep('validating');
     }
   }
 
-  // Como ainda não existe backend de autenticação, este efeito só agenda as
-  // próximas transições visuais (validando → sucesso → Home). Nenhum
-  // token/JWT é criado aqui — isso será feito quando a API real de login
-  // for integrada.
+  // Enquanto "validating", consulta o usuário salvo no localStorage
+  // (CPF e senha). Se estiver correto, mostra a tela de sucesso e segue
+  // para a Home. Se estiver errado, mostra a mensagem de erro perto do
+  // formulário, sem dizer qual dos dois campos está errado.
   useEffect(() => {
-    if (validationStep === 'validating') {
-      const timer = setTimeout(() => setValidationStep('success'), 900);
-      return () => clearTimeout(timer);
+    if (validationStep !== 'validating') {
+      return;
     }
 
+    async function validarLogin() {
+      const resultado = await login(cpf, senha);
+
+      if (resultado.success) {
+        setValidationStep('success');
+      } else {
+        setValidationStep('idle');
+        setMensagemErroLogin('Usuário ou senha incorreto.');
+      }
+    }
+
+    const timer = setTimeout(validarLogin, 900);
+    return () => clearTimeout(timer);
+  }, [validationStep, cpf, senha, login]);
+
+  useEffect(() => {
     if (validationStep === 'success') {
       const timer = setTimeout(() => navigate('/home'), 800);
       return () => clearTimeout(timer);
@@ -67,6 +86,13 @@ function Login() {
           <p className="mt-4 flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
             <CheckCircleOutlined />
             Cadastro efetuado com sucesso
+          </p>
+        )}
+
+        {mensagemErroLogin && (
+          <p className="mt-4 flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+            <CloseCircleOutlined />
+            {mensagemErroLogin}
           </p>
         )}
 
@@ -111,9 +137,9 @@ function Login() {
           </button>
         </form>
 
-        {validationStep !== 'idle' && (
+        {(validationStep === 'validating' || validationStep === 'success') && (
           <ValidationOverlay
-            status={validationStep === 'validating' ? 'validating' : 'success'}
+            status={validationStep}
             validatingText="Validando dados..."
             successText="Dados corretos"
           />
