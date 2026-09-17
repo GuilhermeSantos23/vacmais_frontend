@@ -1,15 +1,15 @@
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import vacmaisLogo from '../../../assets/vacmais-logo.png';
 import { mainNavItems, bottomNavItems } from '../navItems';
 
-// Idêntico, em estrutura e classes, ao Sidebar de
-// usuario/src/components/layout/Sidebar: logo no topo, navegação principal
-// rolável e uma área inferior fixa. Único destaque é o hover (igual lá) —
-// não existe estado de "item ativo". Os itens em si são próprios da área
-// administrativa; cada um navega para sua rota (item.path) definida em
+// Mesma estrutura e classes do Sidebar de usuario/regional. Usa NavLink em
+// vez de Link para que o item da rota atual fique destacado (igual ao
+// padrão já usado no Sidebar de regional). Os itens em si são próprios da
+// área administrativa; cada um navega para sua rota (item.path) definida em
 // navItems.tsx.
 const linkClassName =
   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-emerald-100 hover:bg-emerald-900 hover:text-white';
+const activeLinkClassName = 'bg-emerald-900 text-white';
 
 function Sidebar() {
   return (
@@ -33,10 +33,15 @@ function Sidebar() {
         <ul className="flex flex-col gap-1">
           {mainNavItems.map((item) => (
             <li key={item.label}>
-              <Link to={item.path} className={linkClassName}>
+              <NavLink
+                to={item.path}
+                className={({ isActive }) =>
+                  `${linkClassName} ${isActive ? activeLinkClassName : ''}`
+                }
+              >
                 <span className="text-base">{item.icon}</span>
                 {item.label}
-              </Link>
+              </NavLink>
             </li>
           ))}
         </ul>
@@ -46,10 +51,15 @@ function Sidebar() {
         <ul className="flex flex-col gap-1">
           {bottomNavItems.map((item) => (
             <li key={item.label}>
-              <Link to={item.path} className={linkClassName}>
+              <NavLink
+                to={item.path}
+                className={({ isActive }) =>
+                  `${linkClassName} ${isActive ? activeLinkClassName : ''}`
+                }
+              >
                 <span className="text-base">{item.icon}</span>
                 {item.label}
-              </Link>
+              </NavLink>
             </li>
           ))}
         </ul>

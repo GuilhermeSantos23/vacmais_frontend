@@ -26,12 +26,16 @@
 html,
 body,
 #root {
-  height: 100%;
+  min-height: 100dvh;
   margin: 0;
 }
 
 body {
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  /* Evita o "bounce" de rolagem em telas longas no mobile, que fazia o
+     Bottom Navigation (position: fixed) parecer flutuar no meio da tela
+     em vez de ficar preso na parte inferior da viewport. */
+  overscroll-behavior-y: none;
 }
 
 /* Tema escuro global: sobrescreve as classes utilitárias já usadas nos

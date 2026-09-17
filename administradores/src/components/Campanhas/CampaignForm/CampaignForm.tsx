@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { CloseOutlined } from '@ant-design/icons';
-import type { Campaign, CampaignFormData, HealthUnit } from '../../../types/campaign';
+import type { Campaign, CampaignFormData } from '../../../types/campaign';
 import { formatDateBR, getTodayISO } from '../../../utils/date';
-import CampaignImageUpload from '../CampaignImageUpload/CampaignImageUpload';
-import CampaignLocationSearch from '../CampaignLocationSearch/CampaignLocationSearch';
 
 interface CampaignFormProps {
   /** Campanha sendo editada. Ausente = modo de criação. */
@@ -18,9 +16,7 @@ interface CampaignFormProps {
 interface FormErrors {
   title?: string;
   description?: string;
-  image?: string;
   endDate?: string;
-  locations?: string;
 }
 
 const inputClassName =
@@ -31,10 +27,8 @@ function CampaignForm({ campaign, onSubmit, onCancel, submitting = false }: Camp
 
   const [title, setTitle] = useState(campaign?.title ?? '');
   const [description, setDescription] = useState(campaign?.description ?? '');
-  const [image, setImage] = useState<string | null>(campaign?.image ?? null);
   const [publishedAt, setPublishedAt] = useState(campaign?.publishedAt ?? getTodayISO());
   const [endDate, setEndDate] = useState(campaign?.endDate ?? '');
-  const [locations, setLocations] = useState<HealthUnit[]>(campaign?.locations ?? []);
   const [errors, setErrors] = useState<FormErrors>({});
 
   // A data de disponibilização só pode ser editada na criação, ou na
@@ -51,7 +45,6 @@ function CampaignForm({ campaign, onSubmit, onCancel, submitting = false }: Camp
     else if (endDate < publishedAt) {
       novosErros.endDate = 'A data de encerramento não pode ser anterior à data de disponibilização.';
     }
-    if (locations.length === 0) novosErros.locations = 'Selecione ao menos uma unidade.';
 
     return novosErros;
   }
@@ -63,12 +56,12 @@ function CampaignForm({ campaign, onSubmit, onCancel, submitting = false }: Camp
     setErrors(novosErros);
     if (Object.keys(novosErros).length > 0) return;
 
-    onSubmit({ title, description, image, publishedAt, endDate, locations });
+    onSubmit({ title, description, publishedAt, endDate });
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 px-4 py-10">
-      <div className="flex max-h-[85vh] w-full max-w-2xl flex-col rounded-2xl bg-white shadow-xl">
+      <div className="flex max-h-[85vh] w-full max-w-lg flex-col rounded-2xl bg-white shadow-xl">
         <div className="flex shrink-0 items-start justify-between px-6 pt-6 pb-4">
           <div>
             <h2 className="text-lg font-bold text-gray-900">
@@ -93,8 +86,8 @@ function CampaignForm({ campaign, onSubmit, onCancel, submitting = false }: Camp
           <div className="flex-1 overflow-y-auto px-6">
             <p className="text-sm font-semibold text-emerald-600">Dados</p>
 
-            <div className="mt-3 grid grid-cols-2 gap-x-6 gap-y-4">
-              <div className="col-span-2">
+            <div className="mt-3 flex flex-col gap-4">
+              <div>
                 <label className="mb-1 block text-sm font-medium text-gray-900">Título</label>
                 <input
                   className={`${inputClassName} ${errors.title ? 'border-red-400' : 'border-gray-300'}`}
@@ -105,7 +98,7 @@ function CampaignForm({ campaign, onSubmit, onCancel, submitting = false }: Camp
                 {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
               </div>
 
-              <div className="col-span-2">
+              <div>
                 <label className="mb-1 block text-sm font-medium text-gray-900">Descrição</label>
                 <textarea
                   className={`${inputClassName} min-h-[96px] resize-none ${
@@ -118,46 +111,42 @@ function CampaignForm({ campaign, onSubmit, onCancel, submitting = false }: Camp
                 {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description}</p>}
               </div>
 
-              <CampaignImageUpload value={image} onChange={setImage} error={errors.image} />
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-900">Disponibilizar em</label>
 
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-900">Disponibilizar em</label>
+                  {podeEditarPublicacao ? (
+                    <>
+                      <input
+                        type="date"
+                        className={`${inputClassName} border-gray-300`}
+                        value={publishedAt}
+                        min={getTodayISO()}
+                        onChange={(e) => setPublishedAt(e.target.value)}
+                      />
+                      <p className="mt-1 text-xs text-gray-400">
+                        Hoje = publica imediatamente. Data futura = campanha fica "Agendada" até lá.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="mt-2 text-sm text-gray-500">{formatDateBR(publishedAt)}</p>
+                      <p className="text-xs text-gray-400">Campanha já publicada — data não pode mais ser alterada.</p>
+                    </>
+                  )}
+                </div>
 
-                {podeEditarPublicacao ? (
-                  <>
-                    <input
-                      type="date"
-                      className={`${inputClassName} border-gray-300`}
-                      value={publishedAt}
-                      min={getTodayISO()}
-                      onChange={(e) => setPublishedAt(e.target.value)}
-                    />
-                    <p className="mt-1 text-xs text-gray-400">
-                      Hoje = publica imediatamente. Data futura = campanha fica "Agendada" até lá.
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p className="mt-2 text-sm text-gray-500">{formatDateBR(publishedAt)}</p>
-                    <p className="text-xs text-gray-400">Campanha já publicada — data não pode mais ser alterada.</p>
-                  </>
-                )}
-              </div>
-
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-900">Data de encerramento</label>
-                <input
-                  type="date"
-                  className={`${inputClassName} ${errors.endDate ? 'border-red-400' : 'border-gray-300'}`}
-                  value={endDate}
-                  min={publishedAt}
-                  onChange={(e) => setEndDate(e.target.value)}
-                />
-                {errors.endDate && <p className="mt-1 text-xs text-red-500">{errors.endDate}</p>}
-              </div>
-
-              <div className="col-span-2">
-                <CampaignLocationSearch value={locations} onChange={setLocations} error={errors.locations} />
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-900">Data de encerramento</label>
+                  <input
+                    type="date"
+                    className={`${inputClassName} ${errors.endDate ? 'border-red-400' : 'border-gray-300'}`}
+                    value={endDate}
+                    min={publishedAt}
+                    onChange={(e) => setEndDate(e.target.value)}
+                  />
+                  {errors.endDate && <p className="mt-1 text-xs text-red-500">{errors.endDate}</p>}
+                </div>
               </div>
             </div>
           </div>

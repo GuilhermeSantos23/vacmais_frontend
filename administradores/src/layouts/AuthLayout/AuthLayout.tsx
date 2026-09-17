@@ -19,7 +19,7 @@ function AuthLayout({ children }: AuthLayoutProps) {
             />
             <span className="text-lg font-bold">Vac+</span>
           </div>
-          <p className="mt-1 text-xs text-emerald-100/70">Admins</p>
+          <p className="mt-1 text-xs font-semibold tracking-widest text-emerald-300">ADMINS</p>
         </div>
 
         <h1 className="text-3xl leading-tight font-extrabold sm:text-4xl">

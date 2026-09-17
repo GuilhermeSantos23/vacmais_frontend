@@ -1,13 +1,9 @@
 import { Tabs } from 'antd';
-import ProfileTab from './tabs/ProfileTab';
-import SecurityTab from './tabs/SecurityTab';
 import DeviceTab from './tabs/DeviceTab';
 import PreferencesTab from './tabs/PreferencesTab';
 
 const tabItems = [
-  { key: 'profile', label: 'Perfil', children: <ProfileTab /> },
-  { key: 'security', label: 'Segurança', children: <SecurityTab /> },
-  { key: 'devices', label: 'Dispositivos', children: <DeviceTab /> },
+  { key: 'devices', label: 'Dispositivos conectados', children: <DeviceTab /> },
   { key: 'preferences', label: 'Preferências', children: <PreferencesTab /> },
 ];
 
@@ -16,7 +12,7 @@ function Settings() {
     <div>
       <h1 className="text-2xl font-bold text-gray-900">Configurações</h1>
       <p className="mt-1 text-sm text-gray-500">
-        Gerencie seu perfil, segurança e preferências do sistema.
+        Gerencie os dispositivos conectados e as preferências do sistema.
       </p>
 
       <Tabs items={tabItems} className="mt-6" />

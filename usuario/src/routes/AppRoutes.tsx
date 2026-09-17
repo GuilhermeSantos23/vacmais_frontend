@@ -17,11 +17,12 @@ import CadernetaVacinacao from '../pages/CadernetaVacinacao/CadernetaVacinacao';
 import HistoricoVacinal from '../pages/HistoricoVacinal/HistoricoVacinal';
 import InformacoesVacinais from '../pages/Informacoes/InformacoesVacinais';
 import Missao from '../pages/Missao/Missao';
+import UserProvider from '../contexts/UserProvider';
+import AlertProvider from '../contexts/AlertProvider';
+import { useUser } from '../hooks/useUser';
 
 // Rota de layout: tudo que for uma página "logada" é renderizado dentro
-// do MainLayout, através do <Outlet />. Como o MainLayout só é montado
-// uma vez para todo esse grupo de rotas, o UserProvider e o AlertProvider
-// (que ficam dentro dele) mantêm o estado ao navegar entre as páginas.
+// do MainLayout, através do <Outlet />.
 function AreaLogada() {
   return (
     <MainLayout>
@@ -30,31 +31,60 @@ function AreaLogada() {
   );
 }
 
+// Protege as rotas internas: se ninguém estiver logado, manda para o
+// Login em vez de mostrar a página. Fica dentro do UserProvider/
+// AlertProvider (ver AppRoutes) para poder usar o useUser().
+function RotaProtegida() {
+  const { isAuthenticated } = useUser();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <AreaLogada />;
+}
+
 function AppRoutes() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/cadastro" element={<Cadastro />} />
+      {/* UserProvider e AlertProvider ficam aqui, envolvendo todas as
+          rotas (login, cadastro e área logada), porque o Login e o
+          Cadastro também precisam ler/gravar os dados do usuário. */}
+      <UserProvider>
+        <AlertProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/cadastro" element={<Cadastro />} />
 
-        <Route element={<AreaLogada />}>
-          <Route path="/home" element={<Home />} />
-          <Route path="/unidades-proximas" element={<UnidadesProximas />} />
-          <Route path="/configuracoes" element={<Settings />} />
-          <Route path="/calendario" element={<Calendario />} />
-          <Route path="/servicos" element={<Servicos />} />
-          <Route path="/caderneta-vacinacao" element={<CadernetaVacinacao />} />
-          <Route path="/historico-vacinal" element={<HistoricoVacinal />} />
-          <Route
-            path="/informacoes-vacinais"
-            element={<InformacoesVacinais />}
-          />
-          <Route path="/missao" element={<Missao />} />
-        </Route>
+            <Route element={<RotaProtegida />}>
+              <Route path="/home" element={<Home />} />
+              <Route
+                path="/unidades-proximas"
+                element={<UnidadesProximas />}
+              />
+              <Route path="/configuracoes" element={<Settings />} />
+              <Route path="/calendario" element={<Calendario />} />
+              <Route path="/servicos" element={<Servicos />} />
+              <Route
+                path="/caderneta-vacinacao"
+                element={<CadernetaVacinacao />}
+              />
+              <Route
+                path="/historico-vacinal"
+                element={<HistoricoVacinal />}
+              />
+              <Route
+                path="/informacoes-vacinais"
+                element={<InformacoesVacinais />}
+              />
+              <Route path="/missao" element={<Missao />} />
+            </Route>
 
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </AlertProvider>
+      </UserProvider>
     </BrowserRouter>
   );
 }

@@ -1,25 +1,64 @@
-import { useState } from 'react';
+import { useState, type ChangeEvent } from 'react';
 import { Switch, Input, Alert } from 'antd';
+import { useUser } from '../../../hooks/useUser';
 
 // A ativação real da autenticação em duas etapas (envio do código por
 // email) depende do backend. Por enquanto guardamos só a preferência
 // localmente, deixando o ponto de integração pronto para o futuro.
 function SecurityTab() {
+  const { changePassword } = useUser();
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(true);
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
 
-  function handleChangePassword() {
-    if (newPassword !== confirmPassword) {
-      setPasswordError('As senhas não coincidem.');
-      return;
-    }
+  function handleCurrentPasswordChange(
+    event: ChangeEvent<HTMLInputElement>,
+  ) {
+    setCurrentPassword(event.target.value);
+  }
 
+  function handleNewPasswordChange(event: ChangeEvent<HTMLInputElement>) {
+    setNewPassword(event.target.value);
+  }
+
+  function handleConfirmPasswordChange(
+    event: ChangeEvent<HTMLInputElement>,
+  ) {
+    setConfirmPassword(event.target.value);
+  }
+
+  // Confere a senha atual, confere se a nova senha bate com a
+  // confirmação e só então salva a nova senha no localStorage, através
+  // do userService (mesma arquitetura Página -> Service -> localStorage
+  // usada pelo cadastro e pelo login).
+  async function handleChangePassword() {
     setPasswordError('');
-    // TODO: futuramente enviar currentPassword/newPassword para o backend via Axios.
+    setPasswordSuccess('');
+
+    try {
+      const resultado = await changePassword(
+        currentPassword,
+        newPassword,
+        confirmPassword,
+      );
+
+      if (!resultado.success) {
+        setPasswordError(resultado.message);
+        return;
+      }
+
+      setPasswordSuccess(resultado.message);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error) {
+      console.error(error);
+      setPasswordError('Não foi possível alterar a senha. Tente novamente.');
+    }
   }
 
   return (
@@ -47,7 +86,7 @@ function SecurityTab() {
           </span>
           <Input.Password
             value={currentPassword}
-            onChange={(event) => setCurrentPassword(event.target.value)}
+            onChange={handleCurrentPasswordChange}
           />
         </label>
 
@@ -59,7 +98,7 @@ function SecurityTab() {
           </span>
           <Input.Password
             value={newPassword}
-            onChange={(event) => setNewPassword(event.target.value)}
+            onChange={handleNewPasswordChange}
           />
         </label>
 
@@ -69,13 +108,22 @@ function SecurityTab() {
           </span>
           <Input.Password
             value={confirmPassword}
-            onChange={(event) => setConfirmPassword(event.target.value)}
+            onChange={handleConfirmPasswordChange}
           />
         </label>
       </div>
 
       {passwordError && (
         <Alert type="error" message={passwordError} showIcon className="mt-4" />
+      )}
+
+      {passwordSuccess && (
+        <Alert
+          type="success"
+          message={passwordSuccess}
+          showIcon
+          className="mt-4"
+        />
       )}
 
       <div className="mt-6 flex justify-end">

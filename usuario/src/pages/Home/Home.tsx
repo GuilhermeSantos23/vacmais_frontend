@@ -8,7 +8,7 @@ import mascote from '../../assets/mascote.png';
 // Futuramente virão do backend, junto com o cálculo real do status de
 // imunização (por enquanto o status fica fixo em "Em dia").
 const SUMMARY = {
-  dosesAplicadas: 7,
+  dosesRecebidas: 7,
   dosesPendentes: 3,
   proximaDoseRecomendada: 'Influenza 2026',
   statusImunizacao: 'Em dia',
@@ -32,9 +32,9 @@ function Home() {
           to="/caderneta-vacinacao"
           className="rounded-lg border border-gray-100 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
         >
-          <p className="text-xs font-medium text-gray-500">Doses aplicadas</p>
+          <p className="text-xs font-medium text-gray-500">Doses recebidas</p>
           <p className="mt-2 text-2xl font-bold text-gray-800">
-            {SUMMARY.dosesAplicadas}
+            {SUMMARY.dosesRecebidas}
           </p>
         </Link>
 
