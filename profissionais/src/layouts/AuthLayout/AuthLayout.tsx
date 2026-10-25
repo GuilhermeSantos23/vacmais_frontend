@@ -25,7 +25,7 @@ function AuthLayout({ children }: AuthLayoutProps) {
         </div>
 
         <h1 className="text-3xl leading-tight font-extrabold sm:text-4xl">
-          Central regional
+          Central profissional
           <br />
           inteligente de
           <br />

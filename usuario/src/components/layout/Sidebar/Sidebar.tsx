@@ -23,22 +23,22 @@ const mainNavItems = [
     to: '/unidades-proximas',
   },
   {
-    label: 'Histórico Vacinal',
-    icon: <FolderOutlined />,
-    to: '/historico-vacinal',
-  },
-  {
     label: 'Caderneta de Vacinação',
     icon: <BookOutlined />,
     to: '/caderneta-vacinacao',
   },
-  { label: 'Missão', icon: <CompassOutlined />, to: '/missao' },
+  {
+    label: 'Histórico Vacinal',
+    icon: <FolderOutlined />,
+    to: '/historico-vacinal',
+  },
+  { label: 'Calendário', icon: <CalendarOutlined />, to: '/calendario' },
   {
     label: 'Informações vacinais',
     icon: <InfoCircleOutlined />,
     to: '/informacoes-vacinais',
   },
-  { label: 'Calendário', icon: <CalendarOutlined />, to: '/calendario' },
+  { label: 'Missão', icon: <CompassOutlined />, to: '/missao' },
   { label: 'Serviços', icon: <ToolOutlined />, to: '/servicos' },
 ];
 
