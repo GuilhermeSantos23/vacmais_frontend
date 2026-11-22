@@ -4,10 +4,8 @@ import {
   EnvironmentOutlined,
   FolderOutlined,
   BookOutlined,
-  CompassOutlined,
   InfoCircleOutlined,
   CalendarOutlined,
-  ToolOutlined,
   SettingOutlined,
   LogoutOutlined,
 } from '@ant-design/icons';
@@ -39,8 +37,6 @@ const mainNavItems = [
     icon: <InfoCircleOutlined />,
     to: '/informacoes-vacinais',
   },
-  { label: 'Missão', icon: <CompassOutlined />, to: '/missao' },
-  { label: 'Serviços', icon: <ToolOutlined />, to: '/servicos' },
 ];
 
 const linkClassName =

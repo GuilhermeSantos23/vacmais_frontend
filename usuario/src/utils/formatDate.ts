@@ -26,3 +26,11 @@ export function formatShortDate(date: Date): string {
     year: 'numeric',
   });
 }
+
+/**
+ * Formata uma data só com mês e ano, usado no Histórico Vacinal.
+ * Exemplo: "novembro de 2027".
+ */
+export function formatMonthYear(date: Date): string {
+  return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+}
