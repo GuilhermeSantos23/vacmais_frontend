@@ -34,3 +34,12 @@ export function formatShortDate(date: Date): string {
 export function formatMonthYear(date: Date): string {
   return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
 }
+
+/** Converte "AAAA-MM-DD" em "DD/MM/AAAA". Sem valor, devolve o texto de fallback. */
+export function formatIsoDate(value: string | undefined, fallback = 'Não informado'): string {
+  const match = value ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(value) : null;
+  if (!match) return fallback;
+
+  const [, year, month, day] = match;
+  return `${day}/${month}/${year}`;
+}
