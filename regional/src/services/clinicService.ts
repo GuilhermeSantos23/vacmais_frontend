@@ -5,6 +5,7 @@ import type {
 } from '../types/clinic';
 import { CURRENT_REGIONAL_ADMIN } from '../mocks/session';
 import { onlyDigits } from '../utils/masks';
+import { joinPersonName } from '../utils/personName';
 
 /**
  * Serviço de Clínicas Privadas.
@@ -462,7 +463,14 @@ export function createClinic(data: ClinicFormData): Promise<Clinic> {
     status: data.status,
     administrators: data.administrators.map((admin, index) => ({
       id: `${id}-admin-${index + 1}`,
-      ...admin,
+      firstName: admin.firstName.trim(),
+      lastName: admin.lastName.trim(),
+      name: joinPersonName(admin.firstName, admin.lastName),
+      cpf: admin.cpf,
+      email: admin.email,
+      phone: admin.phone,
+      temporaryPassword: admin.temporaryPassword,
+      login: admin.login,
     })),
     history: [
       {
@@ -508,7 +516,14 @@ export function updateClinic(
     status: data.status,
     administrators: data.administrators.map((admin, i) => ({
       id: existing.administrators[i]?.id ?? `${id}-admin-${i + 1}`,
-      ...admin,
+      firstName: admin.firstName.trim(),
+      lastName: admin.lastName.trim(),
+      name: joinPersonName(admin.firstName, admin.lastName),
+      cpf: admin.cpf,
+      email: admin.email,
+      phone: admin.phone,
+      temporaryPassword: admin.temporaryPassword,
+      login: admin.login,
     })),
     history: [
       ...existing.history,

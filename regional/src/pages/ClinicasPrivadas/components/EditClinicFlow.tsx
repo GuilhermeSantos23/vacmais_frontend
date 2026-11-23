@@ -5,6 +5,7 @@ import ClinicForm from './ClinicForm';
 import SuccessScreen from './SuccessScreen';
 import { searchClinics, updateClinic } from '../../../services/clinicService';
 import type { Clinic, ClinicFormData } from '../../../types/clinic';
+import { readPersonNames } from '../../../utils/personName';
 
 type Step = 'search' | 'result' | 'form' | 'confirm' | 'success';
 
@@ -28,14 +29,18 @@ function clinicToFormData(clinic: Clinic): ClinicFormData {
     email: clinic.email,
     status: clinic.status,
     administratorsCount: clinic.administrators.length,
-    administrators: clinic.administrators.map((admin) => ({
-      name: admin.name,
-      cpf: admin.cpf,
-      email: admin.email,
-      phone: admin.phone,
-      temporaryPassword: admin.temporaryPassword,
-      login: admin.login,
-    })),
+    administrators: clinic.administrators.map((admin) => {
+      const names = readPersonNames(admin);
+      return {
+        firstName: names.firstName,
+        lastName: names.lastName,
+        cpf: admin.cpf,
+        email: admin.email,
+        phone: admin.phone,
+        temporaryPassword: admin.temporaryPassword,
+        login: admin.login,
+      };
+    }),
   };
 }
 
