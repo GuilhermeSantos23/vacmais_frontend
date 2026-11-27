@@ -1,4 +1,5 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useUser } from '../../../hooks/useUser';
 import vacmaisLogo from '../../../assets/vacmais-logo.png';
 import { mainNavItems, bottomNavItems } from '../navItems';
 
@@ -7,6 +8,14 @@ const linkClassName =
 const activeLinkClassName = 'bg-emerald-900 text-white';
 
 function Sidebar() {
+  const { logout } = useUser();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    await logout();
+    navigate('/login', { replace: true });
+  }
+
   return (
     <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col bg-emerald-950 text-emerald-50 lg:flex">
       <div className="px-6 py-6">
@@ -28,15 +37,22 @@ function Sidebar() {
         <ul className="flex flex-col gap-1">
           {mainNavItems.map((item) => (
             <li key={item.key}>
-              <NavLink
-                to={item.path}
-                className={({ isActive }) =>
-                  `${linkClassName} ${isActive ? activeLinkClassName : ''}`
-                }
-              >
-                <span className="text-base">{item.icon}</span>
-                {item.label}
-              </NavLink>
+              {item.label === 'Sair' ? (
+                <button type="button" onClick={handleLogout} className={`${linkClassName} w-full text-left`}>
+                  <span className="text-base">{item.icon}</span>
+                  {item.label}
+                </button>
+              ) : (
+                <NavLink
+                  to={item.path}
+                  className={({ isActive }) =>
+                    `${linkClassName} ${isActive ? activeLinkClassName : ''}`
+                  }
+                >
+                  <span className="text-base">{item.icon}</span>
+                  {item.label}
+                </NavLink>
+              )}
             </li>
           ))}
         </ul>
@@ -46,15 +62,22 @@ function Sidebar() {
         <ul className="flex flex-col gap-1">
           {bottomNavItems.map((item) => (
             <li key={item.key}>
-              <NavLink
-                to={item.path}
-                className={({ isActive }) =>
-                  `${linkClassName} ${isActive ? activeLinkClassName : ''}`
-                }
-              >
-                <span className="text-base">{item.icon}</span>
-                {item.label}
-              </NavLink>
+              {item.label === 'Sair' ? (
+                <button type="button" onClick={handleLogout} className={`${linkClassName} w-full text-left`}>
+                  <span className="text-base">{item.icon}</span>
+                  {item.label}
+                </button>
+              ) : (
+                <NavLink
+                  to={item.path}
+                  className={({ isActive }) =>
+                    `${linkClassName} ${isActive ? activeLinkClassName : ''}`
+                  }
+                >
+                  <span className="text-base">{item.icon}</span>
+                  {item.label}
+                </NavLink>
+              )}
             </li>
           ))}
         </ul>

@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons';
 
 import logo from '../../../assets/vacmais-logo.png';
-import { logout } from '../../../services/authService';
+import { useUser } from '../../../hooks/useUser';
 
 // "to: null" significa que a Page correspondente ainda não existe;
 // esses itens continuam como link de placeholder por enquanto.
@@ -30,11 +30,13 @@ const linkClassName =
 const activeLinkClassName = 'bg-emerald-900 text-white';
 
 function Sidebar() {
+  const { logout } = useUser();
+
   const location = useLocation();
   const navigate = useNavigate();
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await logout();
     navigate('/login', { replace: true });
   }
 

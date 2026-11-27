@@ -16,7 +16,6 @@ export function buildEmptyAdministrator(): UBSAdministratorFormData {
 export function buildEmptyFormData(region: string): UBSFormData {
   return {
     name: '',
-    code: '',
     address: '',
     city: '',
     region,

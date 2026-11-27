@@ -23,7 +23,7 @@ interface Stats {
 }
 
 function UBSs() {
-  const region = CURRENT_REGIONAL_ADMIN.region;
+  const regional = CURRENT_REGIONAL_ADMIN.regional;
 
   const [ubsList, setUBSList] = useState<UBS[]>([]);
   const [stats, setStats] = useState<Stats>({
@@ -200,14 +200,14 @@ function UBSs() {
 
       <RegisterUBSFlow
         open={isRegisterOpen}
-        region={region}
+        region={regional}
         onClose={() => setIsRegisterOpen(false)}
         onRegistered={handleRegistered}
       />
 
       <EditUBSFlow
         ubs={ubsBeingEdited}
-        region={region}
+        region={regional}
         onClose={() => setUBSBeingEdited(null)}
         onUpdated={handleUpdated}
       />

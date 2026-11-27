@@ -38,7 +38,7 @@ export interface UBSHistoryEntry {
 
 export interface UBS {
   id: string;
-  /** Código da unidade, informado no cadastro (ex.: UBS-001). */
+  /** Código da unidade. Gerado automaticamente no cadastro e nunca editável. */
   code: string;
   name: string;
   address: string;
@@ -65,7 +65,6 @@ export interface UBSAdministratorFormData {
 /** Payload do formulário de cadastro/alteração de UBS. */
 export interface UBSFormData {
   name: string;
-  code: string;
   address: string;
   city: string;
   /** Região do administrador regional logado — sempre bloqueada no formulário. */

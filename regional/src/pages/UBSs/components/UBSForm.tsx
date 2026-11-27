@@ -17,7 +17,6 @@ const MAX_ADMINISTRATORS = 10;
 
 interface UBSFormErrors {
   name?: string;
-  code?: string;
   address?: string;
   city?: string;
   phone?: string;
@@ -28,13 +27,22 @@ interface UBSFormErrors {
 
 interface UBSFormProps {
   region: string;
+  /** Código da unidade (somente leitura). Vazio no cadastro: é gerado ao salvar. */
+  unitCode?: string;
   initialData?: UBSFormData;
   submitLabel: string;
   onSubmit: (data: UBSFormData) => void;
   onCancel?: () => void;
 }
 
-function UBSForm({ region, initialData, submitLabel, onSubmit, onCancel }: UBSFormProps) {
+function UBSForm({
+  region,
+  unitCode,
+  initialData,
+  submitLabel,
+  onSubmit,
+  onCancel,
+}: UBSFormProps) {
   const [formData, setFormData] = useState<UBSFormData>(
     () => initialData ?? buildEmptyFormData(region),
   );
@@ -91,7 +99,6 @@ function UBSForm({ region, initialData, submitLabel, onSubmit, onCancel }: UBSFo
     const newErrors: UBSFormErrors = {};
 
     if (!formData.name.trim()) newErrors.name = 'Nome da UBS é obrigatório.';
-    if (!formData.code.trim()) newErrors.code = 'Código da unidade é obrigatório.';
     if (!formData.address.trim()) newErrors.address = 'Endereço é obrigatório.';
     if (!formData.city.trim()) newErrors.city = 'Cidade é obrigatória.';
     if (!formData.phone.trim()) newErrors.phone = 'Telefone é obrigatório.';
@@ -156,10 +163,11 @@ function UBSForm({ region, initialData, submitLabel, onSubmit, onCancel }: UBSFo
           />
           <FormField
             label="Código da unidade"
-            placeholder="UBS-001"
-            value={formData.code}
-            onChange={(e) => updateField('code', e.target.value)}
-            error={errors.code}
+            placeholder="Gerado automaticamente"
+            value={unitCode ?? ''}
+            readOnly
+            disabled
+            className="cursor-not-allowed"
           />
           <FormField
             label="Endereço"

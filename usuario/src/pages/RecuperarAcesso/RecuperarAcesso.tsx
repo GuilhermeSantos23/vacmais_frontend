@@ -17,10 +17,10 @@ const MENSAGEM_CONEXAO =
 const MENSAGEM_NAO_INTEGRADO =
   'A recuperação de acesso ainda não está disponível. Tente novamente mais tarde.';
 
-// Recuperação de acesso: CPF -> código de 6 dígitos enviado ao e-mail
-// cadastrado -> entra direto no perfil. NÃO existe etapa de nova senha
-// (a senha só pode ser trocada em Configurações, já autenticado). Este
-// fluxo é independente do 2FA do login.
+// Mock de recuperação: CPF -> código de e-mail -> aprovação demonstrativa -> login.
+// O service ainda não consulta o backend nem envia/valida e-mail real.
+// O contrato existente do backend Cidadão e sua diferença estão documentados
+// em usuario/README_ENDPOINTS.md para integração posterior.
 function RecuperarAcesso() {
   const [etapa, setEtapa] = useState<Etapa>('cpf');
   const [cpf, setCpf] = useState('');
@@ -114,11 +114,8 @@ function RecuperarAcesso() {
       const resultado = await validarCodigoRecuperacao(cpf, codigo);
 
       if (resultado.status === 'ok') {
-        // O backend confirmou o código. A sessão deve ser estabelecida
-        // com a credencial devolvida por ele (pendente: o formato ainda
-        // não existe). Se a sessão não estiver ativa, a rota protegida
-        // devolve ao login, então ninguém entra sem confirmação.
-        navigate('/home');
+        // Aprovação demonstrativa: retorna ao login. Nenhuma sessão é criada.
+        navigate('/login', { replace: true });
       } else if (resultado.status === 'invalido') {
         setErroCampo('Código inválido. Confira os números e tente de novo.');
       } else if (resultado.status === 'expirado') {

@@ -7,7 +7,7 @@ import {
   SettingOutlined,
   LogoutOutlined,
 } from '@ant-design/icons';
-import { logout } from '../../../services/authService';
+import { useUser } from '../../../hooks/useUser';
 
 // Mesmo rótulo e ícone da Caderneta usados na Sidebar, para manter a
 // identidade coerente entre desktop e mobile.
@@ -24,11 +24,13 @@ const itemClassName =
 const activeItemClassName = 'text-emerald-700';
 
 function BottomNavigation() {
+  const { logout } = useUser();
+
   const location = useLocation();
   const navigate = useNavigate();
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await logout();
     navigate('/login', { replace: true });
   }
 

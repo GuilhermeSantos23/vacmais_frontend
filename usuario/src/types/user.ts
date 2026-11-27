@@ -47,4 +47,6 @@ export interface AuthResult {
   // Motivo da falha, quando a tela precisa reagir a ele (ex: mostrar o
   // erro junto ao campo CPF).
   code?: 'cpf_duplicado' | 'erro_conexao';
+  requiresTwoFactor?: boolean;
+  mustChangePassword?: boolean;
 }

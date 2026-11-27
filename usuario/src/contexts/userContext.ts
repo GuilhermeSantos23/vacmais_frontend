@@ -1,32 +1,21 @@
 import { createContext } from 'react';
-import type { RegisterData } from '../types/user';
+import type { AuthResult, RegisterData } from '../types/user';
 
-// Campos que a aba Perfil pode alterar.
 export interface ProfileData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  susCard: string;
-  region: string;
+  firstName: string; lastName: string; email: string; phone: string; susCard: string; region: string;
 }
 
 export interface UserContextValue {
-  // Autenticação
   isAuthenticated: boolean;
-  login: (
-    cpf: string,
-    senha: string,
-  ) => Promise<{ success: boolean; message: string }>;
-  register: (
-    dados: RegisterData,
-  ) => Promise<{ success: boolean; message: string }>;
-  logout: () => void;
-
-  // Dados do usuário logado.
-  // "userName" continua existindo (mesmo nome de antes) para não quebrar
-  // o Header e o UserAvatar, mas agora representa o firstName, conforme
-  // a regra: o primeiro nome é o que aparece no Header e no avatar.
+  isAuthLoading: boolean;
+  mustChangePassword: boolean;
+  twoFactorPending: boolean;
+  login: (cpf: string, senha: string) => Promise<AuthResult>;
+  verifyTwoFactor: (codigo: string) => Promise<AuthResult>;
+  resendTwoFactor: () => Promise<string>;
+  cancelTwoFactor: () => void;
+  register: (dados: RegisterData) => Promise<AuthResult>;
+  logout: () => Promise<void>;
   userName: string;
   firstName: string;
   lastName: string;
@@ -37,23 +26,9 @@ export interface UserContextValue {
   email: string;
   phone: string;
   susCard: string;
-
-  // Ações usadas pela página de Configurações.
   setAvatarId: (id: string | null) => void;
-  // Salva todos os campos do Perfil de uma vez só. É importante que
-  // seja uma única função: se cada campo fosse salvo separadamente,
-  // uma alteração acabaria apagando a outra, porque todas partem do
-  // mesmo usuário que está guardado no estado.
   updateProfile: (dados: ProfileData) => void;
-  // Troca a senha do usuário logado (confere a senha atual, confere a
-  // confirmação e salva no localStorage).
-  changePassword: (
-    senhaAtual: string,
-    novaSenha: string,
-    confirmacaoNovaSenha: string,
-  ) => Promise<{ success: boolean; message: string }>;
+  changePassword: (senhaAtual: string, novaSenha: string, confirmacaoNovaSenha: string) => Promise<AuthResult>;
 }
 
-export const UserContext = createContext<UserContextValue | undefined>(
-  undefined,
-);
+export const UserContext = createContext<UserContextValue | undefined>(undefined);

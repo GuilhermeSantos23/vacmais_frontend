@@ -38,7 +38,7 @@ function UBSReviewSummary({
         </h3>
         <div className="grid grid-cols-1 gap-4 rounded-lg border border-gray-200 p-4 sm:grid-cols-2">
           <ReviewRow label="Nome da UBS" value={data.name} />
-          <ReviewRow label="Código da unidade" value={data.code} />
+          <ReviewRow label="Código da unidade" value="Gerado automaticamente ao cadastrar" />
           <ReviewRow label="Endereço" value={data.address} />
           <ReviewRow label="Cidade" value={data.city} />
           <ReviewRow label="Região" value={data.region} />

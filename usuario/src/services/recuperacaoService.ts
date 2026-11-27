@@ -1,25 +1,26 @@
-// Serviço da recuperação de acesso ("Esqueci minha senha").
-//
-// IMPORTANTE: o projeto ainda NÃO possui API de backend integrada nem
-// endpoints de recuperação. Por isso estas funções NÃO simulam sucesso:
-// elas devolvem o status 'nao_integrado'. As telas já tratam todos os
-// status abaixo; quando o backend existir, só o corpo destas duas funções
-// precisa ser trocado por chamadas à API.
-//
-// Os nomes dos status são internos do frontend (não são um contrato com
-// o backend). O que o backend precisa fornecer está descrito no relatório
-// de entrega, na seção de pendências.
+/**
+ * MOCK visual de recuperação de acesso do Cidadão.
+ *
+ * Esta camada NÃO chama a API nesta etapa: não procura a conta no banco,
+ * não recupera o e-mail cadastrado e não envia e-mail. Para demonstrar o
+ * fluxo, aceita CPF com 11 dígitos e qualquer código informado com 6 dígitos.
+ * Após a aprovação simulada, a tela retorna ao login; não cria sessão nem
+ * altera a senha.
+ *
+ * O backend já possui POST /auth/recuperacao/solicitar e
+ * POST /auth/recuperacao/validar, mas o contrato atual também exige consumir
+ * o recuperacao_token por /nova-senha ou /entrar. Esse fluxo precisa ser
+ * alinhado com a regra de produto descrita em usuario/README_ENDPOINTS.md
+ * antes de substituir este mock por chamadas HTTP.
+ */
 
 export type SolicitacaoCodigoResultado =
   | { status: 'enviado' }
-  // Reenvio pedido antes do intervalo permitido pelo backend.
   | { status: 'aguardar'; segundos: number }
   | { status: 'erro_conexao' }
   | { status: 'nao_integrado' };
 
 export type ValidacaoCodigoResultado =
-  // Só deve ser devolvido quando o backend confirmar o código e fornecer
-  // a sessão/credencial de autenticação.
   | { status: 'ok' }
   | { status: 'invalido' }
   | { status: 'expirado' }
@@ -27,21 +28,24 @@ export type ValidacaoCodigoResultado =
   | { status: 'erro_conexao' }
   | { status: 'nao_integrado' };
 
-// Pede ao backend o envio do código de 6 dígitos para o e-mail cadastrado
-// na conta do CPF informado.
+function delay<T>(value: T, ms = 550): Promise<T> {
+  return new Promise((resolve) => window.setTimeout(() => resolve(value), ms));
+}
+
 export async function solicitarCodigoRecuperacao(
   cpf: string,
 ): Promise<SolicitacaoCodigoResultado> {
-  void cpf;
-  return { status: 'nao_integrado' };
+  const digits = cpf.replace(/\D/g, '');
+  if (digits.length !== 11) return { status: 'nao_integrado' };
+  return delay({ status: 'enviado' });
 }
 
-// Envia o código digitado ao backend, que é quem decide se ele é válido.
 export async function validarCodigoRecuperacao(
   cpf: string,
   codigo: string,
 ): Promise<ValidacaoCodigoResultado> {
-  void cpf;
-  void codigo;
-  return { status: 'nao_integrado' };
+  const cpfDigits = cpf.replace(/\D/g, '');
+  const codeDigits = codigo.replace(/\D/g, '');
+  if (cpfDigits.length !== 11 || codeDigits.length !== 6) return { status: 'invalido' };
+  return delay({ status: 'ok' });
 }

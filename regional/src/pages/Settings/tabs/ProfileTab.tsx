@@ -37,7 +37,7 @@ function ProfileTab() {
   const lastName = restName.join(' ');
   const email = '';
   const role = CURRENT_REGIONAL_ADMIN.role;
-  const region = CURRENT_REGIONAL_ADMIN.region;
+  const regional = CURRENT_REGIONAL_ADMIN.regional;
 
   const fullName = `${firstName} ${lastName}`.trim();
 
@@ -68,7 +68,7 @@ function ProfileTab() {
         <InfoField label="Sobrenome" value={lastName} />
         <InfoField label="Email" value={email} />
         <InfoField label="Cargo" value={role} />
-        <InfoField label="Região" value={region} />
+        <InfoField label="Regional" value={regional} />
       </div>
 
       <p className="mt-6 text-xs text-gray-500">

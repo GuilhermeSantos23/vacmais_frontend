@@ -19,7 +19,7 @@ interface Stats {
 }
 
 function ClinicasPrivadas() {
-  const region = CURRENT_REGIONAL_ADMIN.region;
+  const regional = CURRENT_REGIONAL_ADMIN.regional;
 
   const [clinics, setClinics] = useState<Clinic[]>([]);
   const [stats, setStats] = useState<Stats>({
@@ -33,7 +33,7 @@ function ClinicasPrivadas() {
 
   const [selectedClinic, setSelectedClinic] = useState<Clinic | null>(null);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [clinicBeingEdited, setClinicBeingEdited] = useState<Clinic | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   async function loadData() {
@@ -78,25 +78,16 @@ function ClinicasPrivadas() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Clínicas Privadas</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Gerencie as clínicas privadas conveniadas da região {region}.
+            Gerencie as clínicas privadas conveniadas da região {regional}.
           </p>
         </div>
-        <div className="flex shrink-0 gap-3">
-          <button
-            type="button"
-            onClick={() => setIsEditOpen(true)}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Alterar
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsRegisterOpen(true)}
-            className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800"
-          >
-            Cadastrar clínica
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setIsRegisterOpen(true)}
+          className="shrink-0 rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800"
+        >
+          Cadastrar clínica
+        </button>
       </div>
 
       {successMessage && (
@@ -167,6 +158,7 @@ function ClinicasPrivadas() {
           clinics={clinics}
           loading={isLoading}
           onSelectClinic={setSelectedClinic}
+          onEditClinic={setClinicBeingEdited}
         />
       </div>
 
@@ -178,15 +170,15 @@ function ClinicasPrivadas() {
 
       <RegisterClinicFlow
         open={isRegisterOpen}
-        region={region}
+        region={regional}
         onClose={() => setIsRegisterOpen(false)}
         onRegistered={handleRegistered}
       />
 
       <EditClinicFlow
-        open={isEditOpen}
-        region={region}
-        onClose={() => setIsEditOpen(false)}
+        clinic={clinicBeingEdited}
+        region={regional}
+        onClose={() => setClinicBeingEdited(null)}
         onUpdated={handleUpdated}
       />
     </div>
