@@ -3,7 +3,6 @@ import Sidebar from '../../components/layout/Sidebar/Sidebar';
 import Header from '../../components/layout/Header/Header';
 import BottomNavigation from '../../components/layout/BottomNavigation/BottomNavigation';
 import HamburguerMenu from '../../components/layout/HamburguerMenu/HamburguerMenu';
-import UserProvider from '../../contexts/UserProvider';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -13,7 +12,6 @@ function MainLayout({ children }: MainLayoutProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <UserProvider>
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar />
 
@@ -35,7 +33,6 @@ function MainLayout({ children }: MainLayoutProps) {
           onClose={() => setIsMenuOpen(false)}
         />
       </div>
-    </UserProvider>
   );
 }
 

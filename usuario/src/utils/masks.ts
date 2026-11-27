@@ -49,3 +49,9 @@ export function maskCEP(value: string): string {
 export function somenteDigitos(value: string, limite: number): string {
   return value.replace(/\D/g, '').slice(0, limite);
 }
+
+
+/** Mantém compatibilidade com os formulários que usam o nome maskNumeric. */
+export function maskNumeric(value: string, maxLength: number): string {
+  return somenteDigitos(value, maxLength);
+}

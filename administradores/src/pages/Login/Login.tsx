@@ -4,116 +4,114 @@ import AuthLayout from '../../layouts/AuthLayout/AuthLayout';
 import FormField from '../../components/form/FormField/FormField';
 import ValidationOverlay from '../../components/common/ValidationOverlay/ValidationOverlay';
 import { maskCPF, maskNumeric } from '../../utils/masks';
+import { useUser } from '../../hooks/useUser';
 
-interface LoginErrors {
-  cpf?: string;
-  senha?: string;
-  codigoUnidade?: string;
-}
-
-type ValidationStep = 'idle' | 'validating' | 'success';
+interface LoginErrors { cpf?: string; senha?: string; codigoUnidade?: string; codigo2FA?: string; }
 
 function Login() {
   const [cpf, setCpf] = useState('');
   const [senha, setSenha] = useState('');
   const [codigoUnidade, setCodigoUnidade] = useState('');
+  const [codigo2FA, setCodigo2FA] = useState('');
   const [errors, setErrors] = useState<LoginErrors>({});
-  const [validationStep, setValidationStep] = useState<ValidationStep>('idle');
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [twoFactorRequired, setTwoFactorRequired] = useState(false);
+  const [message, setMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const { login, verifyTwoFactor, resendTwoFactor, cancelTwoFactor, isAuthenticated, isAuthLoading, mustChangePassword } = useUser();
   const navigate = useNavigate();
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const novosErros: LoginErrors = {};
-    if (!cpf.trim()) novosErros.cpf = 'CPF é obrigatório.';
-    if (!senha.trim()) novosErros.senha = 'Senha é obrigatória.';
-    if (!codigoUnidade.trim()) {
-      novosErros.codigoUnidade = 'Código da unidade é obrigatório.';
+  useEffect(() => {
+    if (!isAuthLoading && isAuthenticated) {
+      navigate(mustChangePassword ? '/alterar-senha' : '/dashboard', { replace: true });
     }
+  }, [isAuthLoading, isAuthenticated, mustChangePassword, navigate]);
 
-    setErrors(novosErros);
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (isSubmitting) return;
 
-    if (Object.keys(novosErros).length === 0) {
-      setValidationStep('validating');
+    const nextErrors: LoginErrors = {};
+    if (twoFactorRequired) {
+      if (codigo2FA.replace(/\D/g, '').length !== 6) nextErrors.codigo2FA = 'Informe o código de 6 dígitos.';
+    } else {
+      if (cpf.replace(/\D/g, '').length !== 11) nextErrors.cpf = 'Informe um CPF válido.';
+      if (!senha) nextErrors.senha = 'Senha é obrigatória.';
+      if (codigoUnidade.replace(/\D/g, '').length !== 6) nextErrors.codigoUnidade = 'O código da unidade deve ter 6 dígitos.';
+    }
+    setErrors(nextErrors);
+    setErrorMessage('');
+    if (Object.keys(nextErrors).length) return;
+
+    setIsSubmitting(true);
+    try {
+      const result = twoFactorRequired
+        ? await verifyTwoFactor(codigo2FA)
+        : await login(cpf, senha, codigoUnidade);
+
+      if (result.requiresTwoFactor) {
+        setTwoFactorRequired(true);
+        setMessage(result.message);
+        setCodigo2FA('');
+        return;
+      }
+      if (result.success) {
+        navigate(result.mustChangePassword ? '/alterar-senha' : '/dashboard', { replace: true });
+      }
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Não foi possível realizar o login.');
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
-  useEffect(() => {
-    if (validationStep === 'validating') {
-      const timer = setTimeout(() => setValidationStep('success'), 900);
-      return () => clearTimeout(timer);
-    }
+  async function handleResendCode() {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    setErrorMessage('');
+    try { setMessage(await resendTwoFactor()); }
+    catch (error) { setErrorMessage(error instanceof Error ? error.message : 'Não foi possível reenviar o código.'); }
+    finally { setIsSubmitting(false); }
+  }
 
-    if (validationStep === 'success') {
-      const timer = setTimeout(() => navigate('/dashboard'), 800);
-      return () => clearTimeout(timer);
-    }
-  }, [validationStep, navigate]);
+  function backToCredentials() {
+    cancelTwoFactor();
+    setTwoFactorRequired(false);
+    setCodigo2FA('');
+    setMessage('');
+    setErrorMessage('');
+  }
 
   return (
     <AuthLayout>
       <div className="relative">
-        <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-          Acesso restrito
-        </h2>
-        <p className="mt-1 text-sm text-gray-500">
-          Autentique-se com suas credenciais.
-        </p>
+        <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">Acesso restrito</h2>
+        <p className="mt-1 text-sm text-gray-500">{twoFactorRequired ? 'Confirme sua identidade para continuar.' : 'Autentique-se com suas credenciais.'}</p>
 
-        <form
-          onSubmit={handleSubmit}
-          className="mt-6 flex flex-col gap-4"
-          noValidate
-        >
-          <FormField
-            label="CPF"
-            type="text"
-            inputMode="numeric"
-            placeholder="123.456.789-00"
-            value={cpf}
-            onChange={(event) => setCpf(maskCPF(event.target.value))}
-            error={errors.cpf}
-          />
+        {message && <p role="status" className="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p>}
+        {errorMessage && <p role="alert" className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{errorMessage}</p>}
 
-          <FormField
-            label="Senha"
-            type="password"
-            value={senha}
-            onChange={(event) => setSenha(event.target.value)}
-            error={errors.senha}
-          />
+        <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4" noValidate>
+          {twoFactorRequired ? (
+            <>
+              <FormField label="Código de verificação" type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={6} placeholder="000000" value={codigo2FA} onChange={(event) => setCodigo2FA(maskNumeric(event.target.value, 6))} error={errors.codigo2FA} />
+              <button type="button" onClick={handleResendCode} disabled={isSubmitting} className="self-start text-sm text-emerald-700 hover:underline disabled:opacity-50">Reenviar código</button>
+              <button type="button" onClick={backToCredentials} disabled={isSubmitting} className="self-start text-sm text-gray-500 hover:underline">Voltar ao login</button>
+            </>
+          ) : (
+            <>
+              <FormField label="CPF" type="text" inputMode="numeric" autoComplete="username" placeholder="123.456.789-00" value={cpf} onChange={(event) => setCpf(maskCPF(event.target.value))} error={errors.cpf} />
+              <FormField label="Senha" type="password" autoComplete="current-password" value={senha} onChange={(event) => setSenha(event.target.value)} error={errors.senha} />
+              <FormField label="Código da unidade" type="text" inputMode="numeric" maxLength={6} placeholder="123456" value={codigoUnidade} onChange={(event) => setCodigoUnidade(maskNumeric(event.target.value, 6))} error={errors.codigoUnidade} />
+              <Link to="/esqueci-senha" className="text-sm text-gray-500 hover:underline">Esqueci minha senha</Link>
+            </>
+          )}
 
-          <FormField
-            label="Código da unidade"
-            type="text"
-            inputMode="numeric"
-            maxLength={8}
-            placeholder="12345678"
-            value={codigoUnidade}
-            onChange={(event) => setCodigoUnidade(maskNumeric(event.target.value, 8))}
-            error={errors.codigoUnidade}
-          />
-
-          <Link to="/esqueci-senha" className="text-sm text-gray-500 hover:underline">
-            Esqueci minha senha
-          </Link>
-
-          <button
-            type="submit"
-            className="mt-10 w-full rounded-lg bg-emerald-300 py-3 text-sm font-semibold text-emerald-950 transition-colors hover:bg-emerald-400"
-          >
-            Entrar
+          <button type="submit" disabled={isSubmitting} className="mt-10 w-full rounded-lg bg-emerald-300 py-3 text-sm font-semibold text-emerald-950 transition-colors hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60">
+            {isSubmitting ? (twoFactorRequired ? 'Validando...' : 'Entrando...') : (twoFactorRequired ? 'Confirmar código' : 'Entrar')}
           </button>
         </form>
-
-        {validationStep !== 'idle' && (
-          <ValidationOverlay
-            status={validationStep === 'validating' ? 'validating' : 'success'}
-            validatingText="Validando credenciais..."
-            successText="Acesso autorizado"
-          />
-        )}
+        {isSubmitting && <ValidationOverlay status="validating" validatingText={twoFactorRequired ? 'Verificando código...' : 'Validando credenciais...'} successText="" />}
       </div>
     </AuthLayout>
   );

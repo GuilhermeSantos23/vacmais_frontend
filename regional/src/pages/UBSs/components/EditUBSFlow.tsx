@@ -26,7 +26,6 @@ interface EditUBSFlowProps {
 function ubsToFormData(ubs: UBS): UBSFormData {
   return {
     name: ubs.name,
-    code: ubs.code,
     address: ubs.address,
     city: ubs.city,
     region: ubs.region,
@@ -94,6 +93,7 @@ function EditUBSFlow({ ubs, region, onClose, onUpdated }: EditUBSFlowProps) {
         {step === 'form' && ubs && (
           <UBSForm
             region={region}
+            unitCode={ubs.code}
             initialData={ubsToFormData(ubs)}
             submitLabel={isSubmitting ? 'Salvando...' : 'Salvar alterações'}
             onSubmit={handleSubmit}

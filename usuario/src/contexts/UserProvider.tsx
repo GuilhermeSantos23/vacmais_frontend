@@ -1,176 +1,154 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { UserContext, type ProfileData } from './userContext';
-import type { RegisterData, User } from '../types/user';
+import type { AuthResult, RegisterData, User } from '../types/user';
+import type { ContaAtual } from '../services/authService';
 import {
-  alterarSenha,
-  autenticarUsuario,
-  atualizarUsuario,
-  buscarCpfLogado,
-  buscarUsuarioPorCpfPublico,
-  cadastrarUsuario,
-  garantirUsuarioDeTeste,
-  removerUsuarioLogado,
-  salvarUsuarioLogado,
-} from '../services/userService';
+  alterarSenhaCidadao,
+  cancelarDoisFatoresCidadao,
+  loginCidadao,
+  obterContaAtual,
+  obterDadosCidadao,
+  possuiSessaoCidadao,
+  reenviarDoisFatoresCidadao,
+  sairCidadao,
+  verificarDoisFatoresCidadao,
+} from '../services/authService';
+import { clearSession } from '../services/sessionStore';
+import { cadastrarUsuario, atualizarUsuario, removerUsuarioLogado } from '../services/userService';
 
-interface UserProviderProps {
-  children: ReactNode;
-}
-
-// Usuário "vazio", usado apenas enquanto ninguém está logado, para que
-// o resto do sistema não precise ficar checando "null" o tempo todo.
+interface UserProviderProps { children: ReactNode; }
 const USUARIO_VAZIO: User = {
-  firstName: '',
-  lastName: '',
-  fullName: '',
-  cpf: '',
-  password: '',
-  region: 'Não informada',
-  avatarId: null,
+  firstName: '', lastName: '', fullName: '', cpf: '', password: '', region: 'Não informada', avatarId: null,
 };
-
-// Verifica se já existe um CPF logado salvo no localStorage (login
-// "lembrado" entre recarregamentos de página) e devolve o usuário
-// correspondente, ou o usuário vazio, se não houver ninguém logado.
-// Fica fora do componente e é usada como inicializador preguiçoso do
-// useState, para não precisar de um useEffect só para ler o estado
-// inicial (o que causaria uma renderização extra desnecessária).
-function buscarEstadoInicial(): { usuario: User; autenticado: boolean } {
-  garantirUsuarioDeTeste();
-
-  const cpfLogado = buscarCpfLogado();
-
-  if (cpfLogado) {
-    const usuarioEncontrado = buscarUsuarioPorCpfPublico(cpfLogado);
-
-    if (usuarioEncontrado) {
-      return { usuario: usuarioEncontrado, autenticado: true };
-    }
-  }
-
-  return { usuario: USUARIO_VAZIO, autenticado: false };
+interface DadosCidadaoApi {
+  nome: string; cpf: string; email: string; telefone: string | null; cartao_sus: string | null;
 }
 
-// Guarda o usuário logado e disponibiliza as ações de login, cadastro,
-// logout e atualização de perfil para todo o sistema.
+function mapearUsuario(nome: string, cpf = '', email = '', telefone: string | null = null, cartaoSus: string | null = null): User {
+  const partes = nome.trim().split(/\s+/).filter(Boolean);
+  return {
+    ...USUARIO_VAZIO,
+    firstName: partes[0] ?? '',
+    lastName: partes.slice(1).join(' '),
+    fullName: nome.trim(),
+    cpf,
+    email,
+    phone: telefone ?? '',
+    susCard: cartaoSus ?? '',
+  };
+}
+
 function UserProvider({ children }: UserProviderProps) {
-  const [usuarioLogado, setUsuarioLogado] = useState<User>(
-    () => buscarEstadoInicial().usuario,
-  );
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
-    () => buscarEstadoInicial().autenticado,
-  );
+  const [usuarioLogado, setUsuarioLogado] = useState<User>(USUARIO_VAZIO);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [mustChangePassword, setMustChangePassword] = useState(false);
+  const [twoFactorPending, setTwoFactorPending] = useState(false);
 
-  async function login(cpf: string, senha: string) {
-    const { resultado, usuario } = await autenticarUsuario(cpf, senha);
+  async function carregarDadosDaConta(conta: ContaAtual): Promise<void> {
+    if (conta.perfil !== 'cidadao') throw new Error('Esta conta não pertence ao perfil Cidadão.');
+    setMustChangePassword(Boolean(conta.deve_trocar_senha));
+    let dados: DadosCidadaoApi | null = null;
+    try { dados = await obterDadosCidadao<DadosCidadaoApi>(); }
+    catch { /* Conta com vínculo pendente pode não ter acesso a /cidadao/eu ainda. */ }
+    const nextUser = dados
+      ? mapearUsuario(dados.nome, dados.cpf, dados.email, dados.telefone, dados.cartao_sus)
+      : mapearUsuario(conta.nome, '', conta.email);
+    setUsuarioLogado(nextUser);
+    setIsAuthenticated(true);
+  }
 
-    if (resultado.success && usuario) {
-      setUsuarioLogado(usuario);
-      setIsAuthenticated(true);
-      salvarUsuarioLogado(usuario.cpf);
+  useEffect(() => {
+    let active = true;
+    async function restoreSession() {
+      if (!possuiSessaoCidadao()) { if (active) setIsAuthLoading(false); return; }
+      try {
+        const conta = await obterContaAtual();
+        if (conta.perfil !== 'cidadao') throw new Error('Perfil de sessão incompatível.');
+        let dados: DadosCidadaoApi | null = null;
+        try { dados = await obterDadosCidadao<DadosCidadaoApi>(); } catch { /* vínculo pendente */ }
+        if (active) {
+          setMustChangePassword(Boolean(conta.deve_trocar_senha));
+          setUsuarioLogado(dados ? mapearUsuario(dados.nome, dados.cpf, dados.email, dados.telefone, dados.cartao_sus) : mapearUsuario(conta.nome, '', conta.email));
+          setIsAuthenticated(true);
+        }
+      } catch {
+        clearSession();
+        if (active) { setUsuarioLogado(USUARIO_VAZIO); setIsAuthenticated(false); setMustChangePassword(false); }
+      } finally { if (active) setIsAuthLoading(false); }
     }
+    void restoreSession();
+    return () => { active = false; };
+  }, []);
 
-    return resultado;
+  async function login(cpf: string, senha: string): Promise<AuthResult> {
+    const result = await loginCidadao(cpf, senha);
+    setTwoFactorPending(result.requiresTwoFactor);
+    if (result.success && !result.requiresTwoFactor && result.account) await carregarDadosDaConta(result.account);
+    return result;
   }
 
-  async function register(dados: RegisterData) {
-    return await cadastrarUsuario(dados);
+  async function verifyTwoFactor(codigo: string): Promise<AuthResult> {
+    const result = await verificarDoisFatoresCidadao(codigo);
+    setTwoFactorPending(result.requiresTwoFactor);
+    if (result.success && !result.requiresTwoFactor && result.account) await carregarDadosDaConta(result.account);
+    return result;
   }
 
-  function logout() {
-    removerUsuarioLogado();
-    setUsuarioLogado(USUARIO_VAZIO);
-    setIsAuthenticated(false);
+  async function resendTwoFactor(): Promise<string> { return reenviarDoisFatoresCidadao(); }
+  function cancelTwoFactor(): void { cancelarDoisFatoresCidadao(); setTwoFactorPending(false); }
+
+  async function register(dados: RegisterData): Promise<AuthResult> {
+    // Cadastro continua local nesta etapa; o README identifica a pendência de integração.
+    return cadastrarUsuario(dados);
   }
 
-  // Altera um campo do usuário logado e salva a alteração no
-  // localStorage, mantendo os dois sempre sincronizados.
+  async function logout(): Promise<void> {
+    try { await sairCidadao(); }
+    finally {
+      removerUsuarioLogado();
+      setUsuarioLogado(USUARIO_VAZIO);
+      setIsAuthenticated(false);
+      setMustChangePassword(false);
+      setTwoFactorPending(false);
+    }
+  }
+
   function atualizarCampo(usuarioComAlteracao: User) {
     setUsuarioLogado(usuarioComAlteracao);
-    atualizarUsuario(usuarioComAlteracao);
+    void atualizarUsuario(usuarioComAlteracao);
   }
 
   function setAvatarId(novoAvatarId: string | null) {
     atualizarCampo({ ...usuarioLogado, avatarId: novoAvatarId });
   }
 
-  // Salva TODOS os campos do Perfil de uma vez só.
-  // Antes existiam três funções separadas (nome, contato e região) e
-  // cada uma partia do mesmo usuário guardado no estado. Como o React
-  // só atualiza o estado depois que a função termina, a segunda chamada
-  // desfazia a primeira e a terceira desfazia a segunda: na prática, só
-  // a última alteração era salva. Com uma função única isso não
-  // acontece mais.
   function updateProfile(dados: ProfileData) {
-    let regiaoFinal = dados.region.trim();
-
-    if (regiaoFinal === '') {
-      regiaoFinal = 'Não informada';
-    }
-
-    const primeiroNome = dados.firstName.trim();
-    const sobrenome = dados.lastName.trim();
-    const nomeCompleto = `${primeiroNome} ${sobrenome}`.trim();
-
-    const usuarioAtualizado: User = {
-      ...usuarioLogado,
-      firstName: primeiroNome,
-      lastName: sobrenome,
-      fullName: nomeCompleto,
-      email: dados.email,
-      phone: dados.phone,
-      susCard: dados.susCard,
-      region: regiaoFinal,
-    };
-
-    atualizarCampo(usuarioAtualizado);
+    const region = dados.region.trim() || 'Não informada';
+    const firstName = dados.firstName.trim();
+    const lastName = dados.lastName.trim();
+    atualizarCampo({ ...usuarioLogado, firstName, lastName, fullName: `${firstName} ${lastName}`.trim(), email: dados.email, phone: dados.phone, susCard: dados.susCard, region });
   }
 
-  // Troca a senha do usuário logado.
-  // O userService confere a senha atual e a confirmação; aqui, quando
-  // dá certo, também atualizamos o usuário guardado no estado, para que
-  // o restante do sistema não continue trabalhando com a senha antiga.
-  async function changePassword(
-    senhaAtual: string,
-    novaSenha: string,
-    confirmacaoNovaSenha: string,
-  ) {
-    const resultado = await alterarSenha(
-      usuarioLogado.cpf,
-      senhaAtual,
-      novaSenha,
-      confirmacaoNovaSenha,
-    );
-
-    if (resultado.success) {
-      setUsuarioLogado({ ...usuarioLogado, password: novaSenha });
+  async function changePassword(senhaAtual: string, novaSenha: string, confirmacaoNovaSenha: string): Promise<AuthResult> {
+    if (!senhaNova.trim() || senhaNova !== confirmacaoNovaSenha) {
+      return { success: false, message: 'A nova senha e a confirmação não coincidem.' };
     }
-
-    return resultado;
+    const result = await alterarSenhaCidadao(senhaAtual, novaSenha, confirmacaoNovaSenha);
+    setMustChangePassword(Boolean(result.mustChangePassword));
+    return { success: result.success, message: result.message };
   }
 
   return (
-    <UserContext.Provider
-      value={{
-        isAuthenticated,
-        login,
-        register,
-        logout,
-        userName: usuarioLogado.firstName || 'Usuário',
-        firstName: usuarioLogado.firstName,
-        lastName: usuarioLogado.lastName,
-        fullName: usuarioLogado.fullName,
-        cpf: usuarioLogado.cpf,
-        region: usuarioLogado.region,
-        avatarId: usuarioLogado.avatarId,
-        email: usuarioLogado.email ?? '',
-        phone: usuarioLogado.phone ?? '',
-        susCard: usuarioLogado.susCard ?? '',
-        setAvatarId,
-        updateProfile,
-        changePassword,
-      }}
-    >
+    <UserContext.Provider value={{
+      isAuthenticated, isAuthLoading, mustChangePassword, twoFactorPending,
+      login, verifyTwoFactor, resendTwoFactor, cancelTwoFactor, register, logout,
+      userName: usuarioLogado.firstName || 'Usuário', firstName: usuarioLogado.firstName,
+      lastName: usuarioLogado.lastName, fullName: usuarioLogado.fullName, cpf: usuarioLogado.cpf,
+      region: usuarioLogado.region, avatarId: usuarioLogado.avatarId,
+      email: usuarioLogado.email ?? '', phone: usuarioLogado.phone ?? '', susCard: usuarioLogado.susCard ?? '',
+      setAvatarId, updateProfile, changePassword,
+    }}>
       {children}
     </UserContext.Provider>
   );

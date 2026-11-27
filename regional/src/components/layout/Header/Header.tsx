@@ -6,14 +6,14 @@ interface HeaderProps {
   onMenuClick: () => void;
   adminName?: string;
   adminRole?: string;
-  regiaoLabel?: string;
+  regionalLabel?: string;
 }
 
 function Header({
   onMenuClick,
   adminName = 'Carla Ribeiro',
   adminRole = 'Admin. Regional',
-  regiaoLabel = 'Região: Centro-Sul/SP',
+  regionalLabel = 'Regional: Centro',
 }: HeaderProps) {
   const today = formatFullDate(new Date());
 
@@ -21,7 +21,7 @@ function Header({
     <header className="flex items-center justify-end gap-4 border-b border-gray-200 bg-white px-4 py-3 lg:gap-5 lg:px-8">
       <div className="hidden text-right text-sm text-gray-600 md:block">
         <p className="font-semibold text-gray-900">{today}</p>
-        <p>{regiaoLabel}</p>
+        <p>{regionalLabel}</p>
       </div>
 
       <button

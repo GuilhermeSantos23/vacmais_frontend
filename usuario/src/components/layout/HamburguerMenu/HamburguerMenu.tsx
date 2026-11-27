@@ -1,3 +1,4 @@
+
 import { Link, useNavigate } from 'react-router-dom';
 import { Drawer } from 'antd';
 import {
@@ -13,8 +14,11 @@ interface HamburgerMenuProps {
 }
 
 const menuItems = [
-
-  { label: 'Configurações', icon: <SettingOutlined />, to: '/configuracoes' },
+  {
+    label: 'Configurações',
+    icon: <SettingOutlined />,
+    to: '/configuracoes',
+  },
 ];
 
 const DARK_GREEN = '#022c22';
@@ -26,10 +30,15 @@ function HamburgerMenu({ open, onClose }: HamburgerMenuProps) {
   const { logout } = useUser();
   const navigate = useNavigate();
 
-  function handleSair() {
-    logout();
-    onClose();
-    navigate('/login');
+  async function handleSair() {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Erro ao encerrar sessão:', error);
+    } finally {
+      onClose();
+      navigate('/login', { replace: true });
+    }
   }
 
   return (
@@ -53,12 +62,22 @@ function HamburgerMenu({ open, onClose }: HamburgerMenuProps) {
       <ul className="flex flex-col gap-1">
         {menuItems.map((item) => (
           <li key={item.label}>
-            <Link to={item.to} onClick={onClose} className={itemClassName}>
-              <span className="text-base !text-emerald-100">{item.icon}</span>
-              <span className="!text-emerald-100">{item.label}</span>
+            <Link
+              to={item.to}
+              onClick={onClose}
+              className={itemClassName}
+            >
+              <span className="text-base !text-emerald-100">
+                {item.icon}
+              </span>
+
+              <span className="!text-emerald-100">
+                {item.label}
+              </span>
             </Link>
           </li>
         ))}
+
         <li>
           <button
             type="button"
@@ -68,7 +87,10 @@ function HamburgerMenu({ open, onClose }: HamburgerMenuProps) {
             <span className="text-base !text-emerald-100">
               <LogoutOutlined />
             </span>
-            <span className="!text-emerald-100">Sair</span>
+
+            <span className="!text-emerald-100">
+              Sair
+            </span>
           </button>
         </li>
       </ul>

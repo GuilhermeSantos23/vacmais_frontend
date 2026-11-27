@@ -34,6 +34,8 @@ interface ClinicFormErrors {
 
 interface ClinicFormProps {
   region: string;
+  /** Código da unidade (somente leitura). Vazio no cadastro: é gerado ao salvar. */
+  unitCode?: string;
   initialData?: ClinicFormData;
   submitLabel: string;
   onSubmit: (data: ClinicFormData) => void;
@@ -42,6 +44,7 @@ interface ClinicFormProps {
 
 function ClinicForm({
   region,
+  unitCode,
   initialData,
   submitLabel,
   onSubmit,
@@ -200,6 +203,14 @@ function ClinicForm({
             value={formData.name}
             onChange={(e) => updateField('name', e.target.value)}
             error={errors.name}
+          />
+          <FormField
+            label="Código da unidade"
+            placeholder="Gerado automaticamente"
+            value={unitCode ?? ''}
+            readOnly
+            disabled
+            className="cursor-not-allowed"
           />
           <FormField
             label="CNPJ"

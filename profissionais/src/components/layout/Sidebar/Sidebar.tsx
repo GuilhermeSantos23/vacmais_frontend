@@ -1,3 +1,4 @@
+
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   HomeOutlined,
@@ -9,7 +10,7 @@ import {
 } from '@ant-design/icons';
 
 import logo from '../../../assets/vacmais-logo.png';
-import { logout } from '../../../services/authService';
+import { useUser } from '../../../hooks/useUser';
 
 // "to: null" significa que a Page correspondente ainda não existe;
 // esses itens continuam como link de placeholder por enquanto.
@@ -30,58 +31,55 @@ const linkClassName =
 const activeLinkClassName = 'bg-emerald-900 text-white';
 
 function Sidebar() {
+  const { logout } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
 
-  function handleLogout() {
-    logout();
-    navigate('/login', { replace: true });
+  async function handleLogout() {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Erro ao encerrar sessão:', error);
+    } finally {
+      navigate('/login', { replace: true });
+    }
   }
 
   return (
     <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col bg-emerald-950 text-emerald-50 lg:flex">
       {/* Logo */}
       <div className="px-6 py-6">
-          <div className="flex items-center gap-2">
-            <img
-              src={logo}
-              alt="Logo vac+"
-              className="h-8 w-8 rounded-lg object-contain"
-            />
-            <span className="text-lg font-bold">Vac+</span>
-          </div>
+        <div className="flex items-center gap-2">
+          <img
+            src={logo}
+            alt="Logo vac+"
+            className="h-8 w-8 rounded-lg object-contain"
+          />
+          <span className="text-lg font-bold">Vac+</span>
+        </div>
 
-          <p className="mt-1 text-xs font-semibold tracking-widest text-emerald-300">
-            PROFISSIONAIS
-          </p>
+        <p className="mt-1 text-xs font-semibold tracking-widest text-emerald-300">
+          PROFISSIONAIS
+        </p>
       </div>
 
       {/* Navegação principal */}
       <nav className="flex-1 overflow-y-auto px-3">
         <ul className="flex flex-col gap-1">
           {mainNavItems.map((item) => {
-            const isActive = item.to
-              ? location.pathname.startsWith(item.to)
-              : false;
+            const isActive = location.pathname.startsWith(item.to);
 
             return (
               <li key={item.label}>
-                {item.to ? (
-                  <Link
-                    to={item.to}
-                    className={`${linkClassName} ${
-                      isActive ? activeLinkClassName : ''
-                    }`}
-                  >
-                    <span className="text-base">{item.icon}</span>
-                    {item.label}
-                  </Link>
-                ) : (
-                  <a href="#" className={linkClassName}>
-                    <span className="text-base">{item.icon}</span>
-                    {item.label}
-                  </a>
-                )}
+                <Link
+                  to={item.to}
+                  className={`${linkClassName} ${
+                    isActive ? activeLinkClassName : ''
+                  }`}
+                >
+                  <span className="text-base">{item.icon}</span>
+                  {item.label}
+                </Link>
               </li>
             );
           })}
@@ -99,8 +97,13 @@ function Sidebar() {
               </Link>
             </li>
           ))}
+
           <li>
-            <button type="button" onClick={handleLogout} className={`${linkClassName} w-full text-left`}>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className={`${linkClassName} w-full text-left`}
+            >
               <span className="text-base">
                 <LogoutOutlined />
               </span>
