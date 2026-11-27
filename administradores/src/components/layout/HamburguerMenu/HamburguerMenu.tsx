@@ -1,3 +1,4 @@
+
 import { Drawer } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
@@ -19,10 +20,16 @@ function HamburguerMenu({ open, onClose }: HamburguerMenuProps) {
   const navigate = useNavigate();
 
   async function handleLogout() {
-    await logout();
-    onClose();
-    navigate('/login', { replace: true });
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Erro ao encerrar sessão:', error);
+    } finally {
+      onClose();
+      navigate('/login', { replace: true });
+    }
   }
+
   return (
     <Drawer
       placement="right"
@@ -45,14 +52,30 @@ function HamburguerMenu({ open, onClose }: HamburguerMenuProps) {
         {bottomNavItems.map((item) => (
           <li key={item.label}>
             {item.label === 'Sair' ? (
-              <button type="button" onClick={handleLogout} className={`${itemClassName} w-full text-left`}>
-                <span className="text-base !text-emerald-100">{item.icon}</span>
-                <span className="!text-emerald-100">{item.label}</span>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className={`${itemClassName} w-full text-left`}
+              >
+                <span className="text-base !text-emerald-100">
+                  {item.icon}
+                </span>
+                <span className="!text-emerald-100">
+                  {item.label}
+                </span>
               </button>
             ) : (
-              <Link to={item.path} onClick={onClose} className={itemClassName}>
-                <span className="text-base !text-emerald-100">{item.icon}</span>
-                <span className="!text-emerald-100">{item.label}</span>
+              <Link
+                to={item.path}
+                onClick={onClose}
+                className={itemClassName}
+              >
+                <span className="text-base !text-emerald-100">
+                  {item.icon}
+                </span>
+                <span className="!text-emerald-100">
+                  {item.label}
+                </span>
               </Link>
             )}
           </li>

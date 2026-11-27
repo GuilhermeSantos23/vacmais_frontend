@@ -1,3 +1,4 @@
+
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useUser } from '../../../hooks/useUser';
 import vacmaisLogo from '../../../assets/vacmais-logo.png';
@@ -10,6 +11,7 @@ import { mainNavItems, bottomNavItems } from '../navItems';
 // navItems.tsx.
 const linkClassName =
   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-emerald-100 hover:bg-emerald-900 hover:text-white';
+
 const activeLinkClassName = 'bg-emerald-900 text-white';
 
 function Sidebar() {
@@ -17,8 +19,13 @@ function Sidebar() {
   const navigate = useNavigate();
 
   async function handleLogout() {
-    await logout();
-    navigate('/login', { replace: true });
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Erro ao encerrar sessão:', error);
+    } finally {
+      navigate('/login', { replace: true });
+    }
   }
 
   return (
@@ -43,7 +50,11 @@ function Sidebar() {
           {mainNavItems.map((item) => (
             <li key={item.label}>
               {item.label === 'Sair' ? (
-                <button type="button" onClick={handleLogout} className={`${linkClassName} w-full text-left`}>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className={`${linkClassName} w-full text-left`}
+                >
                   <span className="text-base">{item.icon}</span>
                   {item.label}
                 </button>
@@ -68,7 +79,11 @@ function Sidebar() {
           {bottomNavItems.map((item) => (
             <li key={item.label}>
               {item.label === 'Sair' ? (
-                <button type="button" onClick={handleLogout} className={`${linkClassName} w-full text-left`}>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className={`${linkClassName} w-full text-left`}
+                >
                   <span className="text-base">{item.icon}</span>
                   {item.label}
                 </button>

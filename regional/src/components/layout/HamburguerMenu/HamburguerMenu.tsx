@@ -1,11 +1,13 @@
+
 import { Drawer } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { bottomNavItems } from '../navItems';
 import { useUser } from '../../../hooks/useUser';
-/*Props do hamburguer menu quando a tela diminui*/
+
+/* Props do hamburguer menu quando a tela diminui */
 interface HamburguerMenuProps {
-  open: boolean; /* Conteudo ministrado nas aulas da apost. Indica um status verdadeiro ou falso/Ativo/inativo*/
+  open: boolean;
   onClose: () => void;
 }
 
@@ -19,10 +21,16 @@ function HamburguerMenu({ open, onClose }: HamburguerMenuProps) {
   const navigate = useNavigate();
 
   async function handleLogout() {
-    await logout();
-    onClose();
-    navigate('/login', { replace: true });
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Erro ao encerrar sessão:', error);
+    } finally {
+      onClose();
+      navigate('/login', { replace: true });
+    }
   }
+
   return (
     <Drawer
       placement="right"
@@ -45,14 +53,30 @@ function HamburguerMenu({ open, onClose }: HamburguerMenuProps) {
         {bottomNavItems.map((item) => (
           <li key={item.key}>
             {item.label === 'Sair' ? (
-              <button type="button" onClick={handleLogout} className={`${itemClassName} w-full text-left`}>
-                <span className="text-base !text-emerald-100">{item.icon}</span>
-                <span className="!text-emerald-100">{item.label}</span>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className={`${itemClassName} w-full text-left`}
+              >
+                <span className="text-base !text-emerald-100">
+                  {item.icon}
+                </span>
+                <span className="!text-emerald-100">
+                  {item.label}
+                </span>
               </button>
             ) : (
-              <NavLink to={item.path} onClick={onClose} className={itemClassName}>
-                <span className="text-base !text-emerald-100">{item.icon}</span>
-                <span className="!text-emerald-100">{item.label}</span>
+              <NavLink
+                to={item.path}
+                onClick={onClose}
+                className={itemClassName}
+              >
+                <span className="text-base !text-emerald-100">
+                  {item.icon}
+                </span>
+                <span className="!text-emerald-100">
+                  {item.label}
+                </span>
               </NavLink>
             )}
           </li>

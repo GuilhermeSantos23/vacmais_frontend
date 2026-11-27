@@ -1,3 +1,4 @@
+
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   HomeOutlined,
@@ -7,10 +8,11 @@ import {
   SettingOutlined,
   LogoutOutlined,
 } from '@ant-design/icons';
+
 import { useUser } from '../../../hooks/useUser';
 
-// Mesmo rótulo e ícone da Caderneta usados na Sidebar, para manter a
-// identidade coerente entre desktop e mobile.
+// Mesmo rótulo e ícone da Caderneta usados na Sidebar,
+// para manter a identidade coerente entre desktop e mobile.
 const bottomNavItems = [
   { label: 'Home', icon: <HomeOutlined />, to: '/home' },
   { label: 'Aplicar Vacinas', icon: <SafetyOutlined />, to: '/aplicacoes' },
@@ -21,17 +23,22 @@ const bottomNavItems = [
 
 const itemClassName =
   'flex w-full flex-col items-center gap-0.5 rounded-lg px-1 py-1.5 text-[10px] text-gray-500 hover:text-emerald-700';
+
 const activeItemClassName = 'text-emerald-700';
 
 function BottomNavigation() {
   const { logout } = useUser();
-
   const location = useLocation();
   const navigate = useNavigate();
 
   async function handleLogout() {
-    await logout();
-    navigate('/login', { replace: true });
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Erro ao encerrar sessão:', error);
+    } finally {
+      navigate('/login', { replace: true });
+    }
   }
 
   return (
@@ -39,11 +46,14 @@ function BottomNavigation() {
       <ul className="flex justify-between px-1 py-1">
         {bottomNavItems.map((item) => {
           const isActive = location.pathname.startsWith(item.to);
+
           return (
             <li key={item.label} className="flex-1">
               <Link
                 to={item.to}
-                className={`${itemClassName} ${isActive ? activeItemClassName : ''}`}
+                className={`${itemClassName} ${
+                  isActive ? activeItemClassName : ''
+                }`}
               >
                 <span className="text-base">{item.icon}</span>
                 {item.label}
@@ -51,8 +61,13 @@ function BottomNavigation() {
             </li>
           );
         })}
+
         <li className="flex-1">
-          <button type="button" onClick={handleLogout} className={itemClassName}>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className={itemClassName}
+          >
             <span className="text-base">
               <LogoutOutlined />
             </span>
