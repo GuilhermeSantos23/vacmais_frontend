@@ -7,7 +7,7 @@ import { useUser } from '../../../hooks/useUser';
 
 /* Props do hamburguer menu quando a tela diminui */
 interface HamburguerMenuProps {
-  open: boolean;
+  open: boolean; /* Conteudo ministrado nas aulas da apost. Indica um status verdadeiro ou falso/Ativo/inativo*/
   onClose: () => void;
 }
 
